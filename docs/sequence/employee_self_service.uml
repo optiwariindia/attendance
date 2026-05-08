@@ -1,0 +1,52 @@
+@startuml
+actor "Employee" as User
+participant "Frontend (SPA)" as FE
+participant "Backend (User/Document Module)" as BE
+database "MongoDB" as DB
+database "Storage (S3/Local)" as FS
+
+== Phase 2: Employee Self-Service Onboarding ==
+
+User -> FE : First Login / Open Onboarding Wizard
+activate FE
+
+FE -> FE : Step 1: Emergency Contact Info
+FE -> FE : Step 2: Bank Details (Name, Acc, IFSC)
+FE -> FE : Step 3: Document Upload (Aadhaar, PAN)
+FE -> FS : Upload Files
+activate FS
+FS --> FE : File Path/ID
+deactivate FS
+
+FE -> FE : Step 4: Review & Accept Policies (T&C, Safety)
+
+FE -> BE : POST /api/v1/user/onboarding-completion {data, docIds, policyAccepted: true}
+activate BE
+
+BE -> BE : Validate Session (JWT)
+BE -> DB : Update User Document (Bank, Emergency, PolicyStatus)
+activate DB
+DB --> BE : Success
+deactivate DB
+
+BE -> DB : Save Document Metadata & Links
+activate DB
+DB --> BE : Saved
+deactivate DB
+
+BE --> FE : 200 OK (Profile Completed)
+deactivate BE
+
+FE --> User : Redirect to Dashboard
+deactivate FE
+
+== Management View ==
+
+actor "Admin" as Admin
+Admin -> FE : View Employee Profile
+FE -> BE : GET /api/v1/user/{id}/full-profile
+BE -> DB : Fetch Full Data & Reporting Structure
+DB --> BE : Data
+BE --> FE : Full Profile (Incl. Bank, Docs, Hierarchy)
+FE --> Admin : Display Complete Profile
+@enduml

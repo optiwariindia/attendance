@@ -1,0 +1,24 @@
+@startuml
+participant "Server Entry (server.js)" as SRV
+participant "Config Module" as CFG
+database "MongoDB" as DB
+
+SRV -> SRV : Bootstrap (PORT, DB_URI from Docker)
+SRV -> DB : Connect to Database
+activate DB
+DB --> SRV : Connected
+deactivate DB
+
+SRV -> CFG : Initialize()
+activate CFG
+CFG -> DB : Fetch all settings from 'configs' collection
+activate DB
+DB --> CFG : Settings Object
+deactivate DB
+CFG -> CFG : Cache settings in memory
+CFG --> SRV : Config Loaded
+deactivate CFG
+
+SRV -> SRV : Apply JWT_SECRET, CORS, etc. from Config
+SRV -> SRV : Start Express Server
+@enduml

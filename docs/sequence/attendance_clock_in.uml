@@ -1,0 +1,30 @@
+@startuml
+actor Employee
+participant "Frontend (SPA)" as FE
+participant "Nginx Gateway" as GW
+participant "Backend (Attendance Module)" as BE
+database "MongoDB" as DB
+
+Employee -> FE : Click "Clock In"
+activate FE
+FE -> FE : Get GPS Coordinates (useGPS)
+FE -> GW : PUT /api/v1/attendance {type: 'in', gps: {lat, lng}}
+activate GW
+GW -> BE : Proxy request
+activate BE
+
+BE -> BE : Validate Session (JWT)
+BE -> BE : Get Server Timestamp
+BE -> DB : Save Attendance Record (gps, timestamp, userId)
+activate DB
+DB --> BE : Success
+deactivate DB
+
+BE --> GW : 200 OK {status: 'success'}
+deactivate BE
+GW --> FE : 200 OK
+deactivate GW
+FE -> FE : Update Dashboard State
+FE --> Employee : Display Success Toast
+deactivate FE
+@enduml

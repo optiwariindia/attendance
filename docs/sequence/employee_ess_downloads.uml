@@ -1,0 +1,43 @@
+@startuml
+actor "Employee" as User
+participant "Frontend (SPA)" as FE
+participant "Backend (Document Module)" as BE
+database "MongoDB" as DB
+database "Storage (S3/Local)" as FS
+
+== Employee Self-Service (ESS): Value to Employee ==
+
+User -> FE : Navigate to "My Documents / ESS"
+activate FE
+
+FE -> BE : GET /api/v1/user/documents (Category: HR_LETTERS)
+activate BE
+BE -> DB : Fetch metadata (Appointment, Promotion, Appraisal)
+activate DB
+DB --> BE : File Links
+deactivate DB
+BE --> FE : List of available documents
+deactivate BE
+
+FE --> User : Show list of HR Letters
+
+User -> FE : Click "Download Appointment Letter"
+FE -> BE : GET /api/v1/user/documents/{id}/download
+activate BE
+BE -> FS : Fetch PDF
+activate FS
+FS --> BE : PDF Stream
+deactivate FS
+BE --> FE : PDF Binary Stream
+deactivate BE
+
+FE --> User : Open/Save PDF
+deactivate FE
+
+== Salary Slips ==
+
+User -> FE : Select Month/Year for Salary Slip
+FE -> BE : GET /api/v1/payroll/slips/{month-year}
+BE --> FE : PDF Download
+FE --> User : View Salary Slip
+@enduml

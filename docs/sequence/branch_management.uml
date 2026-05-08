@@ -1,0 +1,32 @@
+@startuml
+actor "Company Admin" as Admin
+participant "Frontend" as FE
+participant "Backend (Org Module)" as BE
+database "MongoDB" as DB
+
+== Branch (Site) Management ==
+
+Admin -> FE : Navigate to "Branch Management"
+FE -> BE : GET /api/v1/org/branches
+BE -> DB : Fetch branches where tenantID = activeTenant
+DB --> BE : Branch List
+BE --> FE : Data
+FE --> Admin : Display Branches
+
+Admin -> FE : Click "Add New Branch"
+Admin -> FE : Enter Branch Details (Name, Address, GPS Center, Geofence Radius)
+FE -> BE : POST /api/v1/org/branches {name, address, location: {lat, lng}, radius}
+activate BE
+
+BE -> BE : Validate Input
+BE -> BE : Set tenantID from session
+BE -> DB : Save Branch Document
+activate DB
+DB --> BE : Success
+deactivate DB
+
+BE --> FE : 201 Created
+deactivate BE
+
+FE --> Admin : Branch Added Successfully
+@enduml

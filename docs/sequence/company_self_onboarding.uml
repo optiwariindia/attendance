@@ -1,0 +1,44 @@
+@startuml
+actor "New Company Owner" as Owner
+participant "Public Website (Registration)" as WEB
+participant "Backend (Tenant Module)" as BE
+database "MongoDB" as DB
+actor "Superadmin" as SAdmin
+
+== Company Self-Registration ==
+
+Owner -> WEB : Fill Registration Form (Company Name, Slug, Admin Email, Password)
+activate WEB
+
+WEB -> BE : POST /api/v1/public/register-tenant
+activate BE
+
+BE -> BE : Validate Domain Slug & Email Uniqueness
+BE -> DB : Create New Tenant (Status: 'Pending/Active')
+activate DB
+DB --> BE : TenantID
+deactivate DB
+
+BE -> DB : Create User Record {role: 'admin', tenantID, isOwner: true}
+activate DB
+DB --> BE : Success
+deactivate DB
+
+BE --> WEB : 201 Created (Redirect to Setup Wizard)
+deactivate BE
+
+WEB --> Owner : Welcome! Please complete your Org Setup
+deactivate WEB
+
+== Internal Company Setup (By Company Admin) ==
+
+Owner -> BE : POST /api/v1/org/setup (Depts, Designations, Shifts)
+BE -> DB : Save Tenant-Specific Configurations
+BE --> Owner : Setup Complete. You can now onboard employees.
+
+== Superadmin Governance ==
+
+SAdmin -> BE : GET /api/v1/super/tenants (List all companies)
+BE -> DB : Fetch Tenants
+BE --> SAdmin : Tenant List
+@enduml

@@ -1,0 +1,46 @@
+backend/
+├── core
+│   ├── controllers
+│   ├── events
+│   ├── models
+│   ├── routes
+│   ├── services
+│   └── utils
+└── modules
+    ├── attendance
+    │   ├── controllers
+    │   ├── events
+    │   ├── models
+    │   ├── routes
+    │   ├── services
+    │   └── utils
+    ├── auth
+    │   ├── controllers
+    │   ├── events
+    │   ├── models
+    │   ├── routes
+    │   ├── services
+    │   └── utils
+    ├── leaves
+    │   ├── controllers
+    │   ├── events
+    │   ├── models
+    │   ├── routes
+    │   ├── services
+    │   └── utils
+    ├── organization
+    │   ├── controllers
+    │   ├── events
+    │   ├── models
+    │   ├── routes
+    │   ├── services
+    │   └── utils
+    └── settings
+        ├── controllers
+        ├── events
+        ├── models
+        ├── routes
+        ├── services
+        └── utils
+
+44 directories, 0 files

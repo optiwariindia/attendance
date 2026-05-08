@@ -1,0 +1,38 @@
+@startuml
+actor Employee
+participant "Frontend" as FE
+participant "Backend (Leave Module)" as BE
+database "MongoDB" as DB
+actor Admin
+
+Employee -> FE : Submit Leave Request (Dates, Reason)
+activate FE
+FE -> BE : POST /api/v1/leaves
+activate BE
+BE -> BE : Validate Dates vs Holidays
+BE -> DB : Save Leave (status: 'pending')
+activate DB
+DB --> BE : Saved
+deactivate DB
+BE --> FE : Success
+deactivate BE
+FE --> Employee : Display "Pending Approval"
+deactivate FE
+
+... Admin Review ...
+
+Admin -> FE : View Pending Leaves
+FE -> BE : GET /api/v1/leaves/pending
+BE -> DB : Fetch Pending
+DB --> BE : Data
+BE --> FE : Data
+
+Admin -> FE : Click "Approve"
+FE -> BE : PATCH /api/v1/leaves/{id} {status: 'approved'}
+activate BE
+BE -> DB : Update Status
+BE -> BE : (Optional) Trigger Notification
+BE --> FE : Success
+deactivate BE
+FE --> Admin : Updated
+@enduml

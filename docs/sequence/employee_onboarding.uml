@@ -1,0 +1,49 @@
+@startuml
+actor "Administrator" as Admin
+participant "Frontend (Admin Panel)" as FE
+participant "Nginx Gateway" as GW
+participant "Backend (User Module)" as BE
+database "MongoDB" as DB
+participant "Email/SMS Service" as NOTIF
+
+Admin -> FE : Fill Employee Details (ID, Name, Role, Dept, Shift)
+activate FE
+
+FE -> GW : POST /api/v1/user {payload}
+activate GW
+
+GW -> BE : Proxy request
+activate BE
+
+BE -> BE : Verify Admin Permissions (JWT)
+BE -> BE : Validate Input (Unique Email/EmployeeID)
+
+BE -> DB : Fetch Default Configs (Shift, Policy)
+activate DB
+DB --> BE : Default Data
+deactivate DB
+
+BE -> BE : Hash Initial Password
+BE -> DB : Create User Document
+activate DB
+DB --> BE : Success (User Created)
+deactivate DB
+
+BE -> BE : Log Audit Event ("Employee Onboarded")
+
+opt Notification
+    BE -> NOTIF : Send Welcome Email with Credentials
+    activate NOTIF
+    NOTIF --> BE : Sent
+    deactivate NOTIF
+end
+
+BE --> GW : 201 Created {userId, status: 'success'}
+deactivate BE
+
+GW --> FE : 201 Created
+deactivate GW
+
+FE --> Admin : Display "Employee Onboarded Successfully"
+deactivate FE
+@enduml

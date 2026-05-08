@@ -1,0 +1,32 @@
+{
+    "name": "frfs-hrms",
+    "version": "1.0.0",
+    "description": "Human Resource Management System Developed for Frequent Research Fieldwork Solution",
+    "main": "core/index.js",
+    "scripts": {
+        "dev": "nodemon core/server.js",
+        "start": "node core/server.js",
+        "seed": "node seeders/index.js"
+    },
+    "keywords": [
+        "Attendance",
+        "Mini HRMS"
+    ],
+    "author": "Om Prakash Tiwari<optiwari.india@gmail.com>",
+    "license": "ISC",
+    "type": "module",
+    "dependencies": {
+        "bcryptjs": "^3.0.3",
+        "cookie-parser": "^1.4.7",
+        "cors": "^2.8.5",
+        "express": "^5.2.1",
+        "express-fileupload": "^1.5.2",
+        "express-pureip": "^1.0.0",
+        "express-rate-limit": "^8.2.1",
+        "express-web-tools": "^1.0.11",
+        "jsonwebtoken": "^9.0.3",
+        "mongoose": "^9.1.1",
+        "nodemailer": "^7.0.12",
+        "twig": "^1.17.1"
+    }
+}

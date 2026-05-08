@@ -1,0 +1,13 @@
+import { Router } from "express";
+import authRoutes from "./auth/routes/index.js";
+import organizationRoutes from "./organization/routes/index.js";
+import attendanceRoutes from "./attendance/routes/index.js";
+
+const router = Router();
+
+// Mount all modules
+router.use("/api/v1/auth", authRoutes);
+router.use("/api/v1/organization", organizationRoutes);
+router.use("/api/v1/attendance", attendanceRoutes);
+
+export default router;
