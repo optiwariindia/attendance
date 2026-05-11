@@ -5,41 +5,37 @@ The system is built as a **SaaS-ready Multi-tenant Modular Monolith** encapsulat
 
 ### Core Architectural Principles
 - **SaaS Multi-tenancy:** Uses a "Shared Database, Isolated Data" model. Every record is associated with an `origin` (Tenant Identifier).
-- **Tenant Isolation:** A mandatory `setOrigin` middleware and `auth` guard ensure that all database operations are scoped to the authenticated tenant.
+- **Tenant Isolation:** A mandatory `setOrigin` middleware identifies the tenant based on the `host` header. The `MongooseModel` wrapper from `express-web-tools` ensures that all database operations are automatically scoped to the `origin`.
 - **PBAC Security Model:** Implements Permission-Based Access Control (PBAC). Access is granted based on a granular mapping of `role:name` or `user:id` to specific `module:feature:action` combinations, defined in a dedicated `Permission` model.
-- **Cookie-Based Authentication:** Uses `httpOnly` secure cookies for JWT transport, providing robust protection against XSS. Supports standard `Authorization` headers for mobile and external API fallback.
-- **Asynchronous Error Handling:** All routes and guards utilize the `asyncHandler` utility to ensure that asynchronous errors are automatically caught and passed to the centralized Express error middleware, preventing server crashes and maintaining consistent JSON error responses.
-- **Framework-Agnostic Controllers:** Core business logic is encapsulated in class-based controllers that are decoupled from the Express `req/res` objects, ensuring long-term portability and testability.
+- **Cookie-Based Authentication:** Uses `httpOnly` secure cookies for JWT transport, providing robust protection against XSS.
+- **Asynchronous Error Handling:** All routes and guards utilize the `asyncHandler` utility to ensure consistent JSON error responses and prevent server crashes.
+- **Real-time Event Architecture:**
+    - **Internal Event Bus:** A centralized `EventEmitter` (`src/backend/core/events.js`) facilitates decoupled communication between modules (e.g., Attendance emitting a clock event which the SSE module then broadcasts).
+    - **Server-Sent Events (SSE):** Provides a unidirectional real-time stream from server to client. Used for:
+        - **Clock Synchronization:** A 1-second heartbeat (`tick`) ensures clients stay synchronized with server time.
+        - **Instant UI Updates:** Real-time feedback for attendance actions and status changes.
+        - **Security:** Forced logouts can be initiated by the server via the SSE stream.
+- **Framework-Agnostic Controllers:** Core business logic is encapsulated in class-based controllers (extending `CrudController`) that are decoupled from the Express `req/res` objects.
 - **Docker-First Development:** The entire development environment is managed via Docker Compose.
-- **Unified Production Pipeline:** The frontend is built and then served as static content by the Express backend. This simplifies deployment and eliminates CORS issues in production.
-- **SPA Fallback Routing:** The backend handles all undefined routes by serving the frontend's `index.html`, supporting modern SPA routing.
-- **Capacitor Synchronization:** Native mobile variants (Android/iOS) are updated as part of the unified build process via Capacitor's sync/copy mechanism.
+- **Unified Production Pipeline:** The frontend is built and then served as static content by the Express backend.
+- **SPA Fallback Routing:** The backend handles all undefined routes by serving the frontend's `index.html`.
 
 ## 2. Core Modules
 The system is divided into high-level logical modules:
-1.  **Auth Module:** JWT-based authentication, RBAC, and session management.
-2.  **Attendance Module:** GPS capture, shift validation, clock-in/out logic, and verification workflows.
-3.  **Leave & Holiday Module:** Holiday calendar management, leave applications, and balance tracking.
-4.  **Organization Module:** Configuration of **Branches (Sites)**, Departments, Designations, and Policies.
-5.  **User Module:** Employee profile management and reporting hierarchy.
+1.  **Auth Module:** JWT-based authentication, PBAC guards, and session management.
+2.  **Attendance Module:** GPS capture, clock-in/out logic, and verification workflows.
+3.  **Organization Module:** Configuration of **Branches (Sites)**, Departments, and Designations.
+4.  **Leaves Module:** Holiday management and leave application workflows (Work in Progress).
+5.  **SSE Module:** Manages authenticated real-time connections and event broadcasting.
 
 ## 3. Technology Stack
-- **Frontend:** React (SPA) with Material UI for a mobile-first responsive design.
-- **Mobile Variant:** **Capacitor.js** (To wrap the React SPA into native Android/iOS applications).
-- **Backend:** Node.js / Express.js (Modular structure).
-- **Database:** MongoDB (Preferred for flexible schema and Geospatial indexing for GPS data).
-- **Caching:** Redis (Optional, for real-time server clock and session caching).
-- **Communication:** RESTful APIs for client-server interaction.
+- **Frontend:** React (SPA) with Material UI.
+- **Backend:** Node.js / Express.js using `express-web-tools` for boilerplate-free CRUD and multi-tenancy.
+- **Database:** MongoDB (via Mongoose).
+- **Real-time:** Server-Sent Events (SSE).
+- **Mobile:** Capacitor.js (planned).
 
 ## 4. Data Flow & Integration
-- **API First:** All frontend actions are driven by a unified REST API layer.
-- **Geospatial Queries:** Using MongoDB's `$near` or `$geoWithin` for future geofencing features.
-- **Event Bus (Internal):** Use an internal event emitter to decouple modules (e.g., when a Leave is approved, the Attendance module is notified to mark those days).
-
-## 5. Deployment & Configuration Strategy
-- **Containerization:** Dockerized application for consistent environments.
-- **Environment Management:** 
-    - **No `.env` Files:** As a project-wide policy, `.env` or similar files are strictly prohibited.
-    - **Essential Bootstrap:** Critical infrastructure secrets (DB URIs, Port mappings) are injected directly via `docker-compose.yml` and managed by the host OS/orchestrator.
-    - **Config Database:** All application-level settings (Grace periods, Notification templates, Leave policies) are stored in a dedicated configuration database/collection, ensuring central management and real-time updates without service restarts.
-- **Scaling:** Horizontal scaling of the monolithic instance behind a Load Balancer.
+- **Event-Driven:** Modules communicate via the internal `eventStream`.
+- **Origin-Aware:** The `origin` (tenant ID) is injected by middleware and enforced at the model level.
+- **Standardized API:** All modules follow a consistent RESTful pattern for CRUD operations.

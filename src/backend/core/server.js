@@ -19,6 +19,7 @@ const publicDir = currentDir + "/public";
         const app = new ExpressServer();
         app.addMiddleware([
             express.static(publicDir),
+            cookieParser(),
             cors({}),
             express.json(),
             express.urlencoded({
@@ -35,7 +36,6 @@ const publicDir = currentDir + "/public";
         console.log(`[error] ${error.message}`)
     }
 })();
-
 function checkEnvironment(env = ["PORT", "DB"]) {
     let missingVariables = env.filter(e => !(e in process.env));
     if (missingVariables.length > 0) {

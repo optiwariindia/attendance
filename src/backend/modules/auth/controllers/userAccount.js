@@ -1,5 +1,6 @@
 import { CrudController, HttpError } from "express-web-tools";
 import { User } from "../models/index.js";
+import eventStream from "../../../core/events.js";
 
 class UserAccount extends CrudController {
     constructor() {
@@ -9,7 +10,7 @@ class UserAccount extends CrudController {
     // User Self-Service
     async getMe(user) {
         if (!user) throw new HttpError(401, "Unauthorized");
-        return user;
+        return await this.model.findById(user._id); //sending updated value        
     }
 
     async updateProfile(userId, updateData) {
@@ -41,17 +42,38 @@ class UserAccount extends CrudController {
     }
 
     async updateUserDetails(userId, data) {
-        return await this.update(userId, data);
+        const result = await this.update(userId, data);
+        eventStream.emit("user.update", { 
+            userId, 
+            employeeID: result.employeeID, 
+            origin: result.origin, 
+            data: result 
+        });
+        return result;
     }
 
     async changeRole(userId, role) {
         if (!userId || !role) throw new HttpError(400, "User ID and role are required");
-        return await this.update(userId, { role });
+        const result = await this.update(userId, { role });
+        eventStream.emit("user.role_change", { 
+            userId, 
+            employeeID: result.employeeID, 
+            origin: result.origin, 
+            role 
+        });
+        return result;
     }
 
     async setStatus(userId, status) {
         if (!userId || !status) throw new HttpError(400, "User ID and status are required");
-        return await this.update(userId, { workStatus: status });
+        const result = await this.update(userId, { workStatus: status });
+        eventStream.emit("user.status_change", { 
+            userId, 
+            employeeID: result.employeeID, 
+            origin: result.origin, 
+            status 
+        });
+        return result;
     }
 
     async activateAccount(userId) {

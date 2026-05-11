@@ -1,5 +1,6 @@
 import { CrudController, HttpError } from "express-web-tools";
 import { Attendance } from "../models/index.js";
+import eventStream from "../../../core/events.js";
 
 class AttendanceController extends CrudController {
     constructor() {
@@ -8,20 +9,21 @@ class AttendanceController extends CrudController {
 
     /**
      * Perform Clock In/Out
-     * @param {string} userId 
+     * @param {object} user - User object containing _id and employeeID
      * @param {string} action - 'in' or 'out'
      * @param {object} gps - optional { lat, lng, accuracy }
      * @param {string} origin 
      */
-    async clock(userId, action, gpsData, origin) {
+    async clock(user, action, gpsData, origin) {
         if (!["in", "out"].includes(action)) {
             throw new HttpError(400, "Invalid action type");
         }
 
+        const now = new Date();
         const data = {
-            user: userId,
+            user: user._id,
             action,
-            timestamp: new Date(), // Always server time
+            timestamp: now, // Always server time
             origin
         };
 
@@ -36,6 +38,17 @@ class AttendanceController extends CrudController {
         }
 
         const record = await this.model.create(data);
+
+        // Emit event to the global stream using employeeID
+        eventStream.emit("attendance.clock", {
+            userId: user._id,
+            employeeID: user.employeeID,
+            origin,
+            action,
+            record,
+            serverTime: now.toISOString()
+        });
+
         return record;
     }
 

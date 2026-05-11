@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import { User, Role, Permission } from "../modules/auth/models/index.js";
 
-const origin = "frequentresearch";
+const origin = "attendance.sampledge.duckdns.org";
 
 export const seedAuth = async () => {
     console.log("🌱 Seeding Auth Module...");
@@ -54,12 +54,12 @@ export const seedAuth = async () => {
     const adminPassword = await bcrypt.hash("admin123", 10);
     const adminUser = {
         origin,
-        employeeID: "FR001",
+        employeeID: "FR0003",
         name: {
-            first: "Sanket",
-            last: "Engineer"
+            first: "Devashish",
+            last: "Roy"
         },
-        email: "admin@frequentresearch.com",
+        email: "devashish@frequentresearch.com",
         phone: ["9876543210"],
         gender: "male",
         role: "admin",

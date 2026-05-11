@@ -9,8 +9,7 @@ const router = Router();
 router.use(authGuard);
 
 router.get("/me", asyncHandler(async (req, res) => {
-    const result = await userAccountController.getMe(req.user);
-    res.json({ status: "success", data: result });
+    res.json({ status: "success", data: await userAccountController.getMe(req.user) });
 }));
 
 router.patch("/me", asyncHandler(async (req, res) => {

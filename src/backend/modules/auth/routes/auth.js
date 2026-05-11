@@ -18,12 +18,11 @@ const setAuthCookie = (res, token) => {
 router.post("/login", asyncHandler(async (req, res) => {
     const { username, password } = req.body;
     const origin = req.origin;
-    
     const result = await authController.login(username, password, origin);
-    
+
     // Set cookie
     setAuthCookie(res, result.token);
-    
+
     res.json({
         status: "success",
         ...result
@@ -39,9 +38,9 @@ router.post("/register", asyncHandler(async (req, res) => {
     });
 }));
 
-router.post("/logout", authGuard, asyncHandler(async (req, res) => {
+router.delete("/me", authGuard, asyncHandler(async (req, res) => {
     res.clearCookie("authorization");
-    const result = await authController.logout();
+    const result = await authController.logout(req.user, req.origin);
     res.json({
         status: "success",
         ...result

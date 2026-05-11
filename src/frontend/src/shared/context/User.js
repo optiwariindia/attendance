@@ -1,7 +1,7 @@
-import React, { createContext, useContext } from "react"
+import React, { createContext, useContext, useEffect } from "react"
 import { useLocation } from "react-router-dom";
 
-import { api } from "../utils";
+import { api, eventStream } from "../utils";
 
 const UserContext = createContext();
 
@@ -13,7 +13,7 @@ export function UserProvider({
     async function logout() {
         try {
             setIsLoading(true);
-            let resp = await api.delete(`/api/v1/me`, {});
+            let resp = await api.delete(`/api/v1/auth/me`, {});
             if ("status" in resp && resp.status === "error") {
                 console.log(resp.message);
                 return;
@@ -28,7 +28,7 @@ export function UserProvider({
     async function update(info) {
         try {
             setIsLoading(true);
-            let resp = await api.patch(`/api/v1/me`, info);
+            let resp = await api.patch(`/api/v1/auth/me`, info);
             if ("status" in resp && resp.status === "error") {
                 console.log(resp.message);
                 return;
@@ -43,7 +43,7 @@ export function UserProvider({
     async function reload() {
         try {
             setIsLoading(true);
-            let resp = await api.get(`/api/v1/me`);
+            let resp = await api.get(`/api/v1/auth/me`);
             if ("data" in resp) {
                 setUser(resp.data);
             }
@@ -59,13 +59,38 @@ export function UserProvider({
     React.useEffect(() => {
         reload();
     }, [])
+
+    // Manage SSE Connection Lifecycle
+    useEffect(() => {
+        if (user) {
+            eventStream.connect();
+
+            const handleLogoutEvent = () => {
+                console.log("Received logout event from server");
+                setUser(null);
+            };
+            
+            eventStream.addEventListener('logout', handleLogoutEvent);
+
+            return () => {
+                eventStream.removeEventListener('logout', handleLogoutEvent);
+                eventStream.disconnect();
+            };
+        } else {
+            eventStream.disconnect();
+        }
+    }, [user]);
+
     const me = {
         ...user,
         isLoading,
         logout,
         update,
         reload,
-        isLogedIn: Boolean(user)
+        isLoggedIn: Boolean(user),
+        addEventListener: (type, cb) => eventStream.addEventListener(type, cb),
+        removeEventListener: (type, cb) => eventStream.removeEventListener(type, cb),
+        getServerTime: () => eventStream.time
     }
     return <UserContext.Provider value={ me }>{ children }</UserContext.Provider>
 }

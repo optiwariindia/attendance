@@ -13,6 +13,21 @@ const Branch = new MongooseModel(
         },
         phone: {
             type: String
+        },
+        location: {
+            type: {
+                type: String,
+                enum: ["Point"],
+                default: "Point"
+            },
+            coordinates: {
+                type: [Number],
+                default: [0, 0]
+            }
+        },
+        radius: {
+            type: Number,
+            default: 200 // Default radius in meters
         }
     }),
     [
@@ -23,6 +38,11 @@ const Branch = new MongooseModel(
             },
             {
                 unique: true
+            }
+        ],
+        [
+            {
+                location: "2dsphere"
             }
         ]
     ],

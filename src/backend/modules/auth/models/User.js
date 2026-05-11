@@ -76,6 +76,27 @@ const userSchema = new mongoose.Schema({
     reportingTo: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
+    },
+    branch: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Branch"
+    },
+    bankDetails: {
+        accountName: String,
+        accountNumber: String,
+        bankName: String,
+        ifscCode: String,
+        branchName: String
+    },
+    emergencyContact: {
+        name: String,
+        relationship: String,
+        phone: String
+    },
+    onboardingStatus: {
+        type: String,
+        enum: ["Pending", "In Progress", "Completed"],
+        default: "Pending"
     }
 });
 

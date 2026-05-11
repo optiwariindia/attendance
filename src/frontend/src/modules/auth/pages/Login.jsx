@@ -36,7 +36,7 @@ export default function Login() {
             )
             return;
         }
-        let resp = await api.post(`/api/v1/login`, form);
+        let resp = await api.post(`/api/v1/auth/login`, form);
         if (resp.status === "error") {
             setError(resp.message);
             e.target.querySelectorAll("[name]").forEach(

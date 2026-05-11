@@ -21,7 +21,7 @@ router.get("/", permissionGuard("attendance", "tracking", "view"), asyncHandler(
  */
 router.put("/", permissionGuard("attendance", "tracking", "clock"), asyncHandler(async (req, res) => {
     const { type, gps } = req.body;
-    const result = await attendanceController.clock(req.user._id, type, gps, req.origin);
+    const result = await attendanceController.clock(req.user, type, gps, req.origin);
     res.json({ status: "success", data: result });
 }));
 

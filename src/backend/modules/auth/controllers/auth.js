@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { HttpError, CrudController } from "express-web-tools";
 import { User } from "../models/index.js";
+import eventStream from "../../../core/events.js";
 
 class Auth extends CrudController {
     constructor() {
@@ -16,7 +17,7 @@ class Auth extends CrudController {
             $or: [{ email: username }, { employeeID: username }],
             origin,
             isDeleted: false
-        }).select("+password");
+        });
 
         if (!user) {
             throw new HttpError(401, "Invalid credentials");
@@ -33,15 +34,25 @@ class Auth extends CrudController {
             { expiresIn: "1d" }
         );
 
+        const userData = {
+            id: user._id,
+            employeeID: user.employeeID,
+            name: user.fullName,
+            role: user.role,
+            tenantID: user.origin
+        };
+
+        // Emit login event
+        eventStream.emit("auth.login", { 
+            userId: user._id, 
+            employeeID: user.employeeID, 
+            origin, 
+            user: userData 
+        });
+
         return {
             token,
-            user: {
-                id: user._id,
-                employeeID: user.employeeID,
-                name: user.fullName,
-                role: user.role,
-                tenantID: user.origin
-            }
+            user: userData
         };
     }
 
@@ -65,6 +76,15 @@ class Auth extends CrudController {
             workStatus: "Permanent"
         });
 
+        // Emit registration event
+        eventStream.emit("auth.register", {
+            userId: newUser._id,
+            employeeID: newUser.employeeID,
+            origin: domain,
+            email: adminEmail,
+            companyName
+        });
+
         return {
             message: "Company registered successfully",
             data: {
@@ -75,7 +95,15 @@ class Auth extends CrudController {
         };
     }
 
-    async logout() {
+    async logout(user, origin) {
+        // Emit logout event
+        if (user && origin) {
+            eventStream.emit("auth.logout", { 
+                userId: user._id, 
+                employeeID: user.employeeID, 
+                origin 
+            });
+        }
         return { message: "Logged out successfully" };
     }
 

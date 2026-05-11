@@ -1,0 +1,216 @@
+{
+  "employee": {
+    "id": "emp_1",
+    "name": "Amit Sharma",
+    "branch": "Delhi",
+
+    "shift": {
+      "name": "General Shift",
+      "inTime": "09:00",
+      "outTime": "18:00",
+      "workingHours": 540,
+      "lateGraceMinutes": 15,
+      "earlyLeaveGraceMinutes": 10
+    },
+
+    "weeklyOff": 0
+  },
+
+  "summary": {
+    "month": "2026-05",
+
+    "present": 8,
+    "absent": 1,
+    "late": 2,
+    "early": 1,
+    "leave": 2,
+    "officialTrip": 2,
+    "weeklyOff": 4,
+    "holiday": 1,
+
+    "totalWorkingHours": 4680,
+    "totalBreakMinutes": 320,
+    "totalOvertimeMinutes": 410
+  },
+
+  "attendance": [
+    {
+      "date": "2026-05-01",
+
+      "status": "PRESENT",
+
+      "title": "09:00 → 18:00",
+
+      "inTime": "09:00",
+      "outTime": "18:00",
+
+      "grossMinutes": 540,
+      "breakMinutes": 45,
+      "netMinutes": 495,
+
+      "overtimeMinutes": 0,
+
+      "color": "#4caf50"
+    },
+
+    {
+      "date": "2026-05-02",
+
+      "status": "LATE",
+
+      "title": "Late 32m",
+
+      "inTime": "09:32",
+      "outTime": "18:05",
+
+      "grossMinutes": 513,
+      "breakMinutes": 40,
+      "netMinutes": 473,
+
+      "lateMinutes": 32,
+
+      "overtimeMinutes": 0,
+
+      "color": "#ff9800"
+    },
+
+    {
+      "date": "2026-05-03",
+
+      "status": "WEEKLY_OFF",
+
+      "title": "Weekly Off",
+
+      "color": "#2196f3"
+    },
+
+    {
+      "date": "2026-05-04",
+
+      "status": "ABSENT",
+
+      "title": "Absent",
+
+      "color": "#f44336"
+    },
+
+    {
+      "date": "2026-05-05",
+
+      "status": "EARLY",
+
+      "title": "Left Early",
+
+      "inTime": "09:00",
+      "outTime": "16:40",
+
+      "grossMinutes": 460,
+      "breakMinutes": 30,
+      "netMinutes": 430,
+
+      "earlyMinutes": 80,
+
+      "color": "#fbc02d"
+    },
+
+    {
+      "date": "2026-05-06",
+
+      "status": "OVERTIME",
+
+      "title": "OT 2h 15m",
+
+      "inTime": "08:10",
+      "outTime": "19:50",
+
+      "grossMinutes": 700,
+      "breakMinutes": 35,
+      "netMinutes": 665,
+
+      "overtimeMinutes": 135,
+
+      "color": "#8e24aa"
+    },
+
+    {
+      "date": "2026-05-07",
+
+      "status": "MISSING_OUT",
+
+      "title": "Missing OUT",
+
+      "inTime": "09:04",
+
+      "color": "#212121"
+    },
+
+    {
+      "date": "2026-05-08",
+
+      "status": "LEAVE",
+
+      "title": "Casual Leave",
+
+      "leaveType": "CASUAL",
+
+      "paid": true,
+
+      "approvalStatus": "APPROVED",
+
+      "color": "#9c27b0"
+    },
+
+    {
+      "date": "2026-05-09",
+
+      "status": "OFFICIAL_TRIP",
+
+      "title": "Mumbai Client Visit",
+
+      "location": "Mumbai",
+
+      "purpose": "Client Meeting",
+
+      "color": "#00acc1"
+    },
+
+    {
+      "date": "2026-05-10",
+
+      "status": "HOLIDAY",
+
+      "title": "Buddha Purnima",
+
+      "color": "#d81b60"
+    },
+
+    {
+      "date": "2026-05-11",
+
+      "status": "COMP_OFF",
+
+      "title": "Comp Off",
+
+      "earnedFrom": "2026-05-06",
+
+      "color": "#5e35b1"
+    },
+
+    {
+      "date": "2026-05-12",
+
+      "status": "HALF_DAY",
+
+      "title": "Half Day",
+
+      "inTime": "09:00",
+      "outTime": "13:00",
+
+      "grossMinutes": 240,
+      "breakMinutes": 10,
+      "netMinutes": 230,
+
+      "color": "#fb8c00"
+    }
+  ]
+}
