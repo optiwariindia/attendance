@@ -1,11 +1,10 @@
 import React from "react";
 import { Button, Chip, Grid, Typography } from "@mui/material";
 import { Clock, Calendar } from "./index";
-
-import { api } from "../../../shared/utils";
-// import { useGPS } from "../../hooks";
-import { User } from "../../../shared/context";
-const { useUser } = User;
+import * as Shared from "../../../shared";
+const { api } = Shared.Utils;
+const { useUser } = Shared.Context.User;
+const { useGPS } = Shared.Hook
 
 const announcements = [
   {
@@ -36,7 +35,7 @@ const announcements = [
 
 export default function Dashboard() {
   const me = useUser();
-  let { getLocation } = {}; //useGPS();
+  let { getLocation } = useGPS();
   const [activeBtns, setActiveBtns] = React.useState({
     in: true,
     out: false,
@@ -84,135 +83,135 @@ export default function Dashboard() {
     // UpdateClockHistory();
   });
   return (
-    <Grid container spacing={3} px={3} spacing={1.5}>
+    <Grid container spacing={ 3 } px={ 3 } spacing={ 1.5 }>
       <Grid
-        size={{ xs: 12, md: 12 }}
-        sx={{ borderRadius: 2, overflow: "hidden" }}
+        size={ { xs: 12, md: 12 } }
+        sx={ { borderRadius: 2, overflow: "hidden" } }
       >
         <Typography
-          component={"div"}
-          fontSize={18}
-          sx={{ bgcolor: "#5297d9", color: "white", px: 2, py: 1.5 }}
-          style={{
+          component={ "div" }
+          fontSize={ 18 }
+          sx={ { bgcolor: "#5297d9", color: "white", px: 2, py: 1.5 } }
+          style={ {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-          }}
+          } }
         >
           <Clock />
           <Grid
             container
-            alignItems={"center"}
-            justifyContent={"flex-end"}
+            alignItems={ "center" }
+            justifyContent={ "flex-end" }
             container
-            spacing={2}
+            spacing={ 2 }
           >
             <Button
               variant="contained"
-              disabled={!activeBtns.in}
-              sx={{ textTransform: "none", bgcolor: "white", color: "black" }}
-              onClick={(e) => {
+              disabled={ !activeBtns.in }
+              sx={ { textTransform: "none", bgcolor: "white", color: "black" } }
+              onClick={ (e) => {
                 clockAttendance("in");
-              }}
+              } }
             >
               Clock In
             </Button>
             <Button
-              disabled={!activeBtns.out}
+              disabled={ !activeBtns.out }
               variant="contained"
               color="error"
-              sx={{ textTransform: "none" }}
-              onClick={(e) => {
+              sx={ { textTransform: "none" } }
+              onClick={ (e) => {
                 clockAttendance("out");
-              }}
+              } }
             >
               Clock Out
             </Button>
           </Grid>
         </Typography>
         <Grid
-          size={12}
-          sx={{
+          size={ 12 }
+          sx={ {
             bgcolor: "#e3f2fd",
-          }}
+          } }
         >
-          {clockHistory.map((clockInfo) => (
+          { clockHistory.map((clockInfo) => (
             <Grid
-              key={clockInfo._id}
+              key={ clockInfo._id }
               container
               alignItems="center"
-              py={1}
-              spacing={2}
-              px={3}
-              justifyContent={"center"}
+              py={ 1 }
+              spacing={ 2 }
+              px={ 3 }
+              justifyContent={ "center" }
               borderBottom="1px solid #fff"
             >
               <Typography
-                fontSize={14}
-                py={1}
-                sx={{ width: "50%", textAlign: "center" }}
+                fontSize={ 14 }
+                py={ 1 }
+                sx={ { width: "50%", textAlign: "center" } }
               >
-                Clock {clockInfo.action}
+                Clock { clockInfo.action }
               </Typography>
               <Chip
-                color={clockInfo.action === "in" ? "success" : "error"}
-                label={new Date(clockInfo.createdAt).showTime(
+                color={ clockInfo.action === "in" ? "success" : "error" }
+                label={ new Date(clockInfo.createdAt).showTime(
                   "hh-mm-ss",
                   "en-IN",
-                )}
-                sx={{ py: 1, borderRadius: 2, fontWeight: 600 }}
+                ) }
+                sx={ { py: 1, borderRadius: 2, fontWeight: 600 } }
               />
             </Grid>
-          ))}
+          )) }
         </Grid>
       </Grid>
 
       <Grid
-        size={{ xs: 12, md: 9 }}
-        sx={{ borderRadius: 2, overflow: "hidden" }}
+        size={ { xs: 12, md: 9 } }
+        sx={ { borderRadius: 2, overflow: "hidden" } }
       >
         <Calendar />
       </Grid>
       <Grid
-        size={{ xs: 12, md: 3 }}
-        sx={{ borderRadius: 2, bgcolor: "#e3f2fd", overflow: "hidden" }}
+        size={ { xs: 12, md: 3 } }
+        sx={ { borderRadius: 2, bgcolor: "#e3f2fd", overflow: "hidden" } }
       >
         <Typography
-          fontSize={18}
-          sx={{ bgcolor: "#5297d9", color: "white", px: 2, py: 1.5 }}
-          fontWeight={600}
+          fontSize={ 18 }
+          sx={ { bgcolor: "#5297d9", color: "white", px: 2, py: 1.5 } }
+          fontWeight={ 600 }
         >
           Announcements
         </Typography>
         <Grid
-          size={12}
+          size={ 12 }
           container
-          spacing={1}
-          p={1}
+          spacing={ 1 }
+          p={ 1 }
           direction="column"
-          sx={{
+          sx={ {
             maxHeight: 700,
             overflowY: "auto",
             overflowX: "hidden",
             flexWrap: "nowrap",
-          }}
+          } }
         >
-          {announcements.length === 0 ? (
+          { announcements.length === 0 ? (
             <Grid
               container
               alignItems="center"
               justifyContent="center"
-              sx={{
+              sx={ {
                 minHeight: 200,
                 textAlign: "center",
-              }}
+              } }
             >
               <Typography
                 variant="body2"
-                sx={{
+                sx={ {
                   color: "text.secondary",
                   fontWeight: 500,
-                }}
+                } }
               >
                 No announcements available
               </Typography>
@@ -222,44 +221,44 @@ export default function Dashboard() {
               .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
               .map((announcement) => (
                 <Grid
-                  key={announcement.id}
-                  sx={{
+                  key={ announcement.id }
+                  sx={ {
                     p: 1.5,
                     borderBottom: "1px solid #ffffff",
                     bgcolor: "white",
                     borderRadius: 2,
-                  }}
+                  } }
                 >
-                  <Typography fontWeight={600} fontSize={13}>
-                    {announcement.title}
+                  <Typography fontWeight={ 600 } fontSize={ 13 }>
+                    { announcement.title }
                   </Typography>
 
                   <Typography
                     variant="caption"
-                    sx={{
+                    sx={ {
                       mt: 1,
                       fontSize: 12,
                       color: "text.secondary",
                       lineHeight: 1,
-                    }}
+                    } }
                   >
-                    {announcement.message}
+                    { announcement.message }
                   </Typography>
 
                   <Typography
                     variant="caption"
-                    sx={{
+                    sx={ {
                       display: "block",
                       mt: 0.5,
                       fontSize: 11,
                       color: "text.disabled",
-                    }}
+                    } }
                   >
-                    {new Date(announcement.createdAt).toLocaleString("en-IN")}
+                    { new Date(announcement.createdAt).toLocaleString("en-IN") }
                   </Typography>
                 </Grid>
               ))
-          )}
+          ) }
         </Grid>
       </Grid>
 

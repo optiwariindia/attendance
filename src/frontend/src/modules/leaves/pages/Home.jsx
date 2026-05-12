@@ -26,8 +26,6 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import * as Shared from "../../../shared";
 const { Datatable, SectionTitle } = Shared.Components;
-// import SectionTitle from "../../componentsATD/SectionTitle";
-// import Datatable from "../../componentsATD/Datatable";
 
 export default function Leave() {
     const [creatingLeave, setCreatingLeave] = React.useState(false);
@@ -341,11 +339,6 @@ function CreateLeaveRequest({ onBack }) {
         });
 
         console.log([...formData.entries()]);
-
-        // await fetch("/api/leave", {
-        //   method: "POST",
-        //   body: formData,
-        // });
     };
 
     return (
