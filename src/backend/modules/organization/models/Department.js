@@ -10,6 +10,10 @@ const Department = new MongooseModel(
         },
         description: {
             type: String
+        },
+        manager: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
         }
     }),
     [

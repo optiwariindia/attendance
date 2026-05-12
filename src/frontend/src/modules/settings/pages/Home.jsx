@@ -1,15 +1,7 @@
 import React from "react";
 
 import { Grid, Fade, Box, Tabs, Tab } from "@mui/material";
-import {
-    Branches,
-    Departments,
-    Designations,
-    ShiftPolicy,
-    ShiftTimings,
-} from "../components"
-
-// "../../componentsATD/settings";
+import { Branch, Department, Designation, Shift, Holiday, LeaveCategory } from "./";
 
 function TabPanel({ children, value, index }) {
     return (
@@ -23,23 +15,27 @@ export default function Settings() {
     const tabs = [
         {
             label: "Branches",
-            render: <Branches />,
+            render: <Branch />,
         },
         {
             label: "Departments",
-            render: <Departments />,
+            render: <Department />,
         },
         {
             label: "Designations",
-            render: <Designations />,
+            render: <Designation />,
         },
         {
-            label: "Shifts/Office Time Policy",
-            render: <ShiftPolicy />,
+            label: "Shift Policies",
+            render: <Shift />,
         },
         {
-            label: "Shift Time",
-            render: <ShiftTimings />,
+            label: "Holidays",
+            render: <Holiday />,
+        },
+        {
+            label: "Leave Categories",
+            render: <LeaveCategory />,
         },
     ];
     return <TabbedPanel tabs={ tabs } defaultOpen={ 0 } />;

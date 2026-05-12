@@ -8,7 +8,6 @@ import { User } from "../models/index.js";
  */
 const auth = asyncHandler(async (req, res, next) => {
     let authString = req.cookies?.authorization;
-    
     if (!authString) {
         authString = req.headers.authorization;
     }

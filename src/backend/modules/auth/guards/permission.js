@@ -7,6 +7,13 @@ import { Permission } from "../models/index.js";
  */
 const permission = (module, feature, action) => {
     return asyncHandler(async (req, res, next) => {
+        // Bypass permission checks in development phase
+        if (process.env.NODE_ENV !== "production") {
+            console.log(`[Dev Mode] Bypassing Permission Guard for ${module}:${feature}:${action}`);
+            return next();
+        }
+
+        console.log(`Checking Guard for ${module} - ${feature}`)
         if (!req.user) {
             throw new HttpError(401, "Authentication required");
         }

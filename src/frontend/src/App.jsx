@@ -17,14 +17,40 @@ const theme = createTheme({
       main: "#063686",
     },
   },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        '[role="presentation"].MuiPopover-root': {
+          zIndex: 15000,
+        },
+      },
+    },
+  },
+  defaultProps: {
+    arrow: true,
+    enterTouchDelay: 10,
+    leaveTouchDelay: 3000,
+    PopperProps: {
+      modifiers: [
+        {
+          name: "zIndex",
+          enabled: true,
+          phase: "write",
+          fn: ({ state }) => {
+            state.styles.popper.zIndex = 9999;
+          },
+        },
+      ],
+    },
+  },
 });
 
 export default function App() {
   const user = useUser();
   return (
-    <ThemeProvider theme={ theme }>
+    <ThemeProvider theme={theme}>
       <BrowserRouter>
-        { user.isLoading ? <>Loading</> : <RouteList user={ user } /> }
+        {user.isLoading ? <>Loading</> : <RouteList user={user} />}
       </BrowserRouter>
     </ThemeProvider>
   );
@@ -57,6 +83,24 @@ function RouteList({ user }) {
         {
           path: "/user/leave",
           element: <Modules.Leave.Page.Home />,
+        },
+        {
+          path: "/user/settings",
+          element: <Modules.Settings.Page.Home />,
+        },
+      ],
+    },
+    {
+      path: "/admin",
+      element: loginStatus ? <Shared.Layout.Member /> : <Navigate to="/" />,
+      children: [
+        {
+          path: "/admin/user",
+          element: <Modules.Auth.Page.Home />,
+        },
+        {
+          path: "/admin/settings",
+          element: <Modules.Settings.Page.Home />,
         },
       ],
     },

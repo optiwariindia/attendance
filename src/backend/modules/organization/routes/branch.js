@@ -11,6 +11,6 @@ const middleware = {
     delete: [permissionGuard("organization", "structure", "manage")]
 };
 
-const routes = new CrudRoutes("branches", branchController, middleware);
+const routes = new CrudRoutes("/branch", branchController, middleware);
 
 export default routes.publish();

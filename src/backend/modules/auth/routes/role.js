@@ -11,6 +11,6 @@ const middleware = {
     delete: [permissionGuard("config", "policies", "manage")]
 };
 
-const routes = new CrudRoutes("roles", roleController, middleware);
+const routes = new CrudRoutes("/role", roleController, middleware);
 
 export default routes.publish();

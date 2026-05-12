@@ -6,6 +6,8 @@ const Role = new MongooseModel(
     new mongoose.Schema({
         name: {
             type: String,
+            trim: true,
+            lowercase: true,
             required: true
         },
         description: {

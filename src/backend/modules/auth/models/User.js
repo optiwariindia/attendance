@@ -65,9 +65,14 @@ const userSchema = new mongoose.Schema({
     password: { type: String, select: false },
     role: { type: String, trim: true, lowercase: true, default: "user" },
     profilePicture: { type: String },
+    sortOrder: { type: Number, default: 0 },
     timezone: {
         type: String,
         default: "Asia/Kolkata"
+    },
+    workPolicy: {
+        allowOutsideLogin: { type: Boolean, default: false },
+        isWFH: { type: Boolean, default: false }
     },
     shift: {
         type: mongoose.Schema.Types.ObjectId,
@@ -80,6 +85,23 @@ const userSchema = new mongoose.Schema({
     branch: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Branch"
+    },
+    routing: {
+        leave: {
+            to: [{ type: String }],
+            cc: [{ type: String }],
+            bcc: [{ type: String }]
+        },
+        finance: {
+            to: [{ type: String }],
+            cc: [{ type: String }],
+            bcc: [{ type: String }]
+        },
+        it: {
+            to: [{ type: String }],
+            cc: [{ type: String }],
+            bcc: [{ type: String }]
+        }
     },
     bankDetails: {
         accountName: String,

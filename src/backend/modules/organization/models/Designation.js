@@ -8,9 +8,16 @@ const Designation = new MongooseModel(
             type: String,
             required: true
         },
+        description: {
+            type: String
+        },
         priority: {
             type: Number,
             default: 0
+        },
+        department: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Department"
         }
     }),
     [
