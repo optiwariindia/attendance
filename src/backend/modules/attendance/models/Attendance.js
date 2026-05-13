@@ -7,51 +7,84 @@ const attendanceSchema = new mongoose.Schema({
         ref: "User",
         required: true
     },
-    action: {
-        type: String,
-        enum: ["in", "out"],
-        required: true
+    shift: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Shift"
     },
-    timestamp: {
-        type: Date,
-        default: Date.now,
-        required: true
-    },
-    gps: {
-        type: {
-            type: String,
-            enum: ["Point"],
-            default: "Point"
+    in: {
+        time: {
+            type: Date
         },
-        coordinates: {
-            type: [Number],
-            default: [0, 0]
+        gps: {
+            type: {
+                type: String,
+                enum: ["Point"],
+                default: "Point"
+            },
+            coordinates: {
+                type: [Number],
+                default: [0, 0]
+            }
+        },
+        status: {
+            type: String,
+            enum: ["late", "ontime", "OT", "OffDay"]
+        },
+        gpsAccuracy: {
+            type: Number
         }
     },
-    gpsAccuracy: {
-        type: Number
+    out: {
+        time: {
+            type: Date
+        },
+        gps: {
+            type: {
+                type: String,
+                enum: ["Point"],
+                default: "Point"
+            },
+            coordinates: {
+                type: [Number],
+                default: [0, 0]
+            }
+        },
+        status: {
+            type: String,
+            enum: ["late", "ontime", "OT", "OffDay"]
+        },
+        gpsAccuracy: {
+            type: Number
+        }
     },
-    status: {
-        type: String,
-        enum: ["On Time", "Late In", "Early Out", "Overtime", "Regular"],
-        default: "On Time"
-    },
-    verified: {
-        type: Boolean,
-        default: false
-    },
+    break: [
+        {
+            start: {
+                type: Date
+            },
+            end: {
+                type: Date
+            },
+            duration: {
+                type: Number // in minutes
+            }
+        }
+    ],
     remarks: {
         type: String
     }
 });
 
-// Add 2dsphere index for geospatial queries
+// Indexes for performance and geospatial queries
 const attendanceIndexes = [
     [
-        { gps: "2dsphere" }
+        { "in.gps": "2dsphere" }
     ],
     [
-        { user: 1, origin: 1, timestamp: -1 }
+        { "out.gps": "2dsphere" }
+    ],
+    [
+        { user: 1, origin: 1, "in.time": -1 }
     ]
 ];
 

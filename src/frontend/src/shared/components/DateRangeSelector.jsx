@@ -109,7 +109,7 @@ const DateRangeSelector = ({ onUpdate, defaultValue, ...attr }) => {
                     color="black"
                     onClick={ handleClick }
                     sx={ {
-                        minWidth: 240,
+                        minWidth: 280,
 
                         borderColor: "grey.500",
                         color: "grey.900",

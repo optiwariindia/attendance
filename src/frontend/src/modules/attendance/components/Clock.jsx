@@ -19,7 +19,7 @@ export default function Clock() {
         <>
             {
                 <Typography sx={ { fontSize: { xs: 12, md: 16 } } }>
-                    { time.toFormat("dd-mm-yyyy - hh:mm:ss") }
+                    { time.toFormat("dd-mmm-yyyy - hh:mm:ss") }
                 </Typography>
             }
         </>

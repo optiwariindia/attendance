@@ -1,62 +1,29 @@
-import { Router } from "express";
-import { asyncHandler } from "express-web-tools";
-import attendanceController from "../controllers/attendance.js";
-import { auth as authGuard, permission as permissionGuard } from "../../auth/guards/index.js";
+import express from "express";
+import { auth as AuthGuard } from "../../auth/guards/index.js";
+import controller from "../controllers/attendance.js";
 
-const router = Router();
+const router = express.Router();
 
-// --- All routes require authentication ---
-router.use(authGuard);
+// User routes
+router.post("/clock", AuthGuard, async (req, res, next) => {
+    try {
+        const { action, gps, origin } = req.body;
+        controller.request=req;
+        const result = await controller.clock(req.user, action, gps, origin || req.headers.host);
+        res.json(result);
+    } catch (err) {
+        next(err);
+    }
+});
 
-/**
- * Personal Attendance History
- */
-router.get("/", permissionGuard("attendance", "tracking", "view"), asyncHandler(async (req, res) => {
-    const result = await attendanceController.getHistory(req.user._id, req.query);
-    res.json({ status: "success", data: result });
-}));
-
-/**
- * Perform Clock In/Out
- */
-router.put("/", permissionGuard("attendance", "tracking", "clock"), asyncHandler(async (req, res) => {
-    const { type, gps } = req.body;
-    const result = await attendanceController.clock(req.user, type, gps, req.origin);
-    res.json({ status: "success", data: result });
-}));
-
-/**
- * Get Server Time
- */
-router.get("/time", asyncHandler(async (req, res) => {
-    const result = await attendanceController.getServerTime();
-    res.json({ status: "success", ...result });
-}));
-
-/**
- * Admin: Get All Attendance Logs
- */
-router.get("/logs", permissionGuard("attendance", "tracking", "manage"), asyncHandler(async (req, res) => {
-    attendanceController.request = req;
-    const result = await attendanceController.list(req.query, ["user"]);
-    res.json({ status: "success", data: result });
-}));
-
-/**
- * Admin: Bulk Verify Logs
- */
-router.post("/verify", permissionGuard("attendance", "tracking", "verify"), asyncHandler(async (req, res) => {
-    const { ids } = req.body;
-    const result = await attendanceController.verifyLogs(ids, req.origin);
-    res.json({ status: "success", ...result });
-}));
-
-/**
- * Admin: Manual Correction
- */
-router.post("/correction", permissionGuard("attendance", "tracking", "manage"), asyncHandler(async (req, res) => {
-    const result = await attendanceController.correction(req.body, req.origin);
-    res.json({ status: "success", data: result });
-}));
+router.get("/history", AuthGuard, async (req, res, next) => {
+    try {
+        controller.request=req;
+        const result = await controller.getHistory(req.user._id, req.query);
+        res.json(result);
+    } catch (err) {
+        next(err);
+    }
+});
 
 export default router;

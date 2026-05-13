@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Chip, Grid, Typography } from "@mui/material";
 import { Clock, Calendar } from "./index";
 import * as Shared from "../../../shared";
-const { api } = Shared.Utils;
+const { api, eventStream } = Shared.Utils;
 const { useUser } = Shared.Context.User;
 const { useGPS } = Shared.Hook
 
@@ -41,49 +41,73 @@ export default function Dashboard() {
     out: false,
   });
   const [clockHistory, setClockHistory] = React.useState([]);
+  const [currentInTime, setCurrentInTime] = React.useState(null);
+
   async function UpdateClockHistory() {
-    let resp = await api.get(`/api/v1/attendance`);
+    let resp = await api.get(`/api/v1/attendance/history`);
     if (resp?.status === "success") {
       setClockHistory(resp.data);
+      
+      // Determine button states and current in-time based on latest record
+      const latest = resp.data[0];
+      if (latest) {
+        if (latest.in?.time) {
+          setCurrentInTime(latest.in.time);
+        } else {
+          setCurrentInTime(null);
+        }
+
+        // If clocked in but not out
+        if (latest.in?.time && !latest.out?.time) {
+          setActiveBtns({ in: false, out: true });
+        } else if (latest.in?.time && latest.out?.time) {
+          // If both exist, allow punch-in (for breaks) and punch-out (to update final)
+          setActiveBtns({ in: true, out: true });
+        } else {
+          setActiveBtns({ in: true, out: false });
+        }
+      } else {
+        setCurrentInTime(null);
+        setActiveBtns({ in: true, out: false });
+      }
     }
   }
-  async function clockAttendance(type) {
+
+  async function clockAttendance(action) {
     let gps = await getLocation();
 
-    let resp = await api.put(`/api/v1/attendance`, {
-      type,
+    let resp = await api.post(`/api/v1/attendance/clock`, {
+      action,
       gps,
     });
-    if ("status" in resp && resp.status === "error") {
+    
+    if (resp?.status === "error") {
       alert(resp.message);
       return;
     }
-    if (resp.status === "success") {
-      UpdateClockHistory();
-    }
+    
+    // Refresh history immediately as fallback if SSE is delayed
+    UpdateClockHistory();
   }
+
   React.useEffect(() => {
     if (!me) return;
     UpdateClockHistory();
-  }, [me, activeBtns.in]);
-  document.addEventListener("in", () => {
-    if (activeBtns.in === false) return;
-    setActiveBtns({
-      in: false,
-      out: true,
-    });
-    // UpdateClockHistory();
-  });
-  document.addEventListener("out", () => {
-    if (activeBtns.out === false) return;
-    setActiveBtns({
-      in: true,
-      out: false,
-    });
-    // UpdateClockHistory();
-  });
+
+    const handleAttendanceUpdate = (event) => {
+      console.log("Real-time attendance update received:", event.data);
+      UpdateClockHistory();
+    };
+
+    eventStream.addEventListener("attendance_update", handleAttendanceUpdate);
+
+    return () => {
+      eventStream.removeEventListener("attendance_update", handleAttendanceUpdate);
+    };
+  }, [me]);
+
   return (
-    <Grid container spacing={ 3 } px={ 3 } spacing={ 1.5 }>
+    <Grid container spacing={ 3 } px={ 3 }>
       <Grid
         size={ { xs: 12, md: 12 } }
         sx={ { borderRadius: 2, overflow: "hidden" } }
@@ -98,83 +122,108 @@ export default function Dashboard() {
             alignItems: "center",
           } }
         >
-          <Clock />
+          <Grid container alignItems="center" spacing={2}>
+            <Grid item><Clock /></Grid>
+            {currentInTime && (
+              <Grid item>
+                <Chip 
+                  label={`In: ${new Date(currentInTime).showTime("hh-mm-ss", "en-IN")}`} 
+                  sx={{ bgcolor: "white", color: "#5297d9", fontWeight: 700, borderRadius: 1 }}
+                />
+              </Grid>
+            )}
+          </Grid>
           <Grid
             container
+            item
+            xs={6}
             alignItems={ "center" }
             justifyContent={ "flex-end" }
-            container
             spacing={ 2 }
           >
-            <Button
-              variant="contained"
-              disabled={ !activeBtns.in }
-              sx={ { textTransform: "none", bgcolor: "white", color: "black" } }
-              onClick={ (e) => {
-                clockAttendance("in");
-              } }
-            >
-              Clock In
-            </Button>
-            <Button
-              disabled={ !activeBtns.out }
-              variant="contained"
-              color="error"
-              sx={ { textTransform: "none" } }
-              onClick={ (e) => {
-                clockAttendance("out");
-              } }
-            >
-              Clock Out
-            </Button>
+            <Grid item>
+              <Button
+                variant="contained"
+                disabled={ !activeBtns.in }
+                sx={ { textTransform: "none", bgcolor: "white", color: "black", "&:disabled": { bgcolor: "#eee", color: "#aaa" } } }
+                onClick={ (e) => {
+                  clockAttendance("in");
+                } }
+              >
+                Clock In
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                disabled={ !activeBtns.out }
+                variant="contained"
+                color="error"
+                sx={ { textTransform: "none" } }
+                onClick={ (e) => {
+                  clockAttendance("out");
+                } }
+              >
+                Clock Out
+              </Button>
+            </Grid>
           </Grid>
         </Typography>
         <Grid
-          size={ 12 }
+          container
           sx={ {
             bgcolor: "#e3f2fd",
           } }
         >
-          { clockHistory.map((clockInfo) => (
-            <Grid
-              key={ clockInfo._id }
-              container
-              alignItems="center"
-              py={ 1 }
-              spacing={ 2 }
-              px={ 3 }
-              justifyContent={ "center" }
-              borderBottom="1px solid #fff"
-            >
-              <Typography
-                fontSize={ 14 }
-                py={ 1 }
-                sx={ { width: "50%", textAlign: "center" } }
-              >
-                Clock { clockInfo.action }
-              </Typography>
-              <Chip
-                color={ clockInfo.action === "in" ? "success" : "error" }
-                label={ new Date(clockInfo.createdAt).showTime(
-                  "hh-mm-ss",
-                  "en-IN",
-                ) }
-                sx={ { py: 1, borderRadius: 2, fontWeight: 600 } }
-              />
-            </Grid>
+          { clockHistory.slice(0, 5).map((record) => (
+            <React.Fragment key={ record._id }>
+              { record.in?.time && (
+                <Grid
+                  container
+                  alignItems="center"
+                  py={ 1 }
+                  px={ 3 }
+                  justifyContent={ "space-between" }
+                  borderBottom="1px solid #fff"
+                >
+                  <Typography fontSize={ 14 }>Clock In</Typography>
+                  <Chip
+                    color="success"
+                    label={ new Date(record.in.time).showTime("hh-mm-ss", "en-IN") }
+                    sx={ { py: 1, borderRadius: 2, fontWeight: 600 } }
+                  />
+                </Grid>
+              ) }
+              { record.out?.time && (
+                <Grid
+                  container
+                  alignItems="center"
+                  py={ 1 }
+                  px={ 3 }
+                  justifyContent={ "space-between" }
+                  borderBottom="1px solid #fff"
+                >
+                  <Typography fontSize={ 14 }>Clock Out</Typography>
+                  <Chip
+                    color="error"
+                    label={ new Date(record.out.time).showTime("hh-mm-ss", "en-IN") }
+                    sx={ { py: 1, borderRadius: 2, fontWeight: 600 } }
+                  />
+                </Grid>
+              ) }
+            </React.Fragment>
           )) }
         </Grid>
       </Grid>
 
       <Grid
         size={ { xs: 12, md: 9 } }
-        sx={ { borderRadius: 2, overflow: "hidden" } }
+        sx={ { borderRadius: 2, overflow: "hidden", mt: 2 } }
       >
         <Calendar />
       </Grid>
       <Grid
         size={ { xs: 12, md: 3 } }
-        sx={ { borderRadius: 2, bgcolor: "#e3f2fd", overflow: "hidden" } }
+        sx={ { borderRadius: 2, bgcolor: "#e3f2fd", overflow: "hidden", mt: 2 } }
       >
         <Typography
           fontSize={ 18 }
@@ -184,7 +233,6 @@ export default function Dashboard() {
           Announcements
         </Typography>
         <Grid
-          size={ 12 }
           container
           spacing={ 1 }
           p={ 1 }
@@ -221,12 +269,14 @@ export default function Dashboard() {
               .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
               .map((announcement) => (
                 <Grid
+                  item
                   key={ announcement.id }
                   sx={ {
                     p: 1.5,
                     borderBottom: "1px solid #ffffff",
                     bgcolor: "white",
                     borderRadius: 2,
+                    mb: 1
                   } }
                 >
                   <Typography fontWeight={ 600 } fontSize={ 13 }>

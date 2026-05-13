@@ -91,12 +91,6 @@ class SSE {
         client.write(`event: ${event}\ndata: ${payload}\n\n`);
     }
 
-    /**
-     * Publish event to clients
-     * @param {string} event 
-     * @param {any} data 
-     * @param {object} filters - { origin, employeeID }
-     */
     publish(event, data, filters = {}) {
         const { origin, employeeID } = filters;
 
