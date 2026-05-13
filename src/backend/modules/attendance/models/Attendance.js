@@ -26,10 +26,6 @@ const attendanceSchema = new mongoose.Schema({
                 default: [0, 0]
             }
         },
-        status: {
-            type: String,
-            enum: ["late", "ontime", "OT", "OffDay"]
-        },
         gpsAccuracy: {
             type: Number
         }
@@ -48,10 +44,6 @@ const attendanceSchema = new mongoose.Schema({
                 type: [Number],
                 default: [0, 0]
             }
-        },
-        status: {
-            type: String,
-            enum: ["late", "ontime", "OT", "OffDay"]
         },
         gpsAccuracy: {
             type: Number

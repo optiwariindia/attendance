@@ -6,7 +6,10 @@ class UserAccount extends CrudController {
     constructor() {
         super(User);
     }
-
+    async list(query = {}, populateFields= null, sort= {}, project = null) {
+        populateFields="reportingTo branch shift"
+        return super.list(query, populateFields, sort, project ) 
+    }
     // User Self-Service
     async getMe(user) {
         if (!user) throw new HttpError(401, "Unauthorized");

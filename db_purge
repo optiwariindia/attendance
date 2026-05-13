@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# db_purge script to cleanup soft-deleted items from all collections
+echo "Starting database purge for soft-deleted items..."
+
+docker compose exec -T db mongosh hrms --quiet --eval "
+  db.getCollectionNames().forEach(function(coll) {
+    var result = db.getCollection(coll).deleteMany({ isDeleted: true });
+    if (result.deletedCount > 0) {
+      print('Cleaned ' + result.deletedCount + ' items from: ' + coll);
+    } else {
+      print('No soft-deleted items in: ' + coll);
+    }
+  });
+"
+
+echo "Purge process completed."

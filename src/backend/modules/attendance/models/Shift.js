@@ -7,11 +7,11 @@ const shiftSchema = new mongoose.Schema({
         required: true
     },
     startTime: {
-        type: String, // e.g., "09:00"
+        type: String, 
         required: true
     },
     endTime: {
-        type: String, // e.g., "18:00"
+        type: String,
         required: true
     },
     breakDuration: {
