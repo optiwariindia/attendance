@@ -1,6 +1,7 @@
 import React from "react";
 import { Box } from "@mui/material";
 import * as Shared from "../../../shared";
+import { loadData } from "../../../shared/utils";
 const { Datatable, DateRangeSelector } = Shared.Components;
 const { useUser } = Shared.Context.User;
 const { api } = Shared.Utils
@@ -8,22 +9,12 @@ function List() {
     const [data, setData] = React.useState([]);
     const [dateRange, setDateRange] = React.useState([]);
     const me = useUser();
-    React.useEffect(() => {
-        if (!me?._id) return;
+    // loadData(
 
-        api
-            .post(`/api/v1/attendance`, {
-                dateRange,
-            })
-            .then((resp) => {
-                setData(resp.data);
-            });
-        // api
-        //   .get(`/api/v1/attendance/all`)
-        //   .then(resp=>{
-        //     console.log(resp);
-        //   })
-    }, [me, dateRange]);
+    // )
+    React.useEffect(() => {
+        api.get("/api/v1/attendance")
+    }, []);
 
     const columns = [
         {

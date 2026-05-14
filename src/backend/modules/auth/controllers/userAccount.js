@@ -13,12 +13,32 @@ class UserAccount extends CrudController {
     // User Self-Service
     async getMe(user) {
         if (!user) throw new HttpError(401, "Unauthorized");
-        return await this.model.findById(user._id); //sending updated value        
+        return await this.model.findById(user._id).populate("shift"); //sending updated value        
     }
 
     async updateProfile(userId, updateData) {
         // Allowed fields for self-update (logic should be handled by validation on route side)
         return await this.update(userId, updateData);
+    }
+
+    async finishOnboarding(userId) {
+        const user = await this.model.findById(userId);
+        if (!user) throw new HttpError(404, "User not found");
+
+        // Basic validation: ensure bank details and emergency contact are present
+        if (!user.bankDetails?.accountNumber || !user.bankDetails?.ifscCode) {
+            throw new HttpError(400, "Please provide complete bank details.");
+        }
+        if (!user.emergencyContact?.phone || !user.emergencyContact?.name) {
+            throw new HttpError(400, "Please provide emergency contact details.");
+        }
+        if (!user.nationalID || user.nationalID.length === 0) {
+            throw new HttpError(400, "Please provide at least one National ID (e.g., PAN, Aadhar).");
+        }
+
+        user.onboardingStatus = "Completed";
+        await user.save();
+        return { message: "Onboarding completed successfully", onboardingStatus: "Completed" };
     }
 
     async changePassword(userId, currentPassword, newPassword) {

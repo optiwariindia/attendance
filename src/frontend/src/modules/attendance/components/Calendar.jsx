@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   Grid,
   Box,
@@ -15,7 +15,9 @@ import { Calendar as BigCalendar, dateFnsLocalizer } from "react-big-calendar";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { format, parse, startOfWeek, getDay } from "date-fns";
-import attendanceData from "./attendanceData.json";
+import { useUser } from "../../../shared/context/User";
+import { api, loadData } from "../../../shared/utils";
+
 const locales = {
   "en-US": require("date-fns/locale/en-US"),
 };
@@ -26,6 +28,7 @@ const localizer = dateFnsLocalizer({
   getDay,
   locales,
 });
+
 const STATUS_LABELS = {
   PRESENT: "Present",
   ABSENT: "Absent",
@@ -37,25 +40,77 @@ const STATUS_LABELS = {
   LEAVE: "Leave",
   OFFICIAL_TRIP: "Official Trip",
   MISSING_OUT: "Missing OUT",
+  IN_OFFICE: "In Office",
   HALF_DAY: "Half Day",
   COMP_OFF: "Comp Off",
 };
+
+const STATUS_COLORS = {
+  PRESENT: "#4caf50",
+  ABSENT: "#f44336",
+  LATE: "#ff9800",
+  EARLY: "#fbc02d",
+  OVERTIME: "#8e24aa",
+  HOLIDAY: "#d81b60",
+  WEEKLY_OFF: "#2196f3",
+  LEAVE: "#9c27b0",
+  OFFICIAL_TRIP: "#00acc1",
+  MISSING_OUT: "#212121",
+  IN_OFFICE: "#4caf50",
+  HALF_DAY: "#fb8c00",
+  COMP_OFF: "#5e35b1",
+};
+
 function minutesToHours(minutes = 0) {
   const hrs = Math.floor(minutes / 60);
   const mins = minutes % 60;
   return `${hrs}h ${mins}m`;
 }
+
 export default function Calendar() {
+  const me = useUser();
+  const [report, setReport] = useState(null);
+  const [date, setDate] = useState(new Date());
+
+  const fetchReport = (d) => {
+    const year = d.getFullYear();
+    const month = d.getMonth() + 1;
+    loadData(
+      api.get(`/api/v1/attendance/my/report?year=${year}&month=${month}`),
+      (resp) => {
+        setReport(resp.data);
+      }
+    );
+  };
+
+  useEffect(() => {
+    fetchReport(date);
+
+    const handleClockEvent = () => {
+      fetchReport(date);
+    };
+
+    me.addEventListener("clock-in", handleClockEvent);
+    me.addEventListener("clock-out", handleClockEvent);
+
+    return () => {
+      me.removeEventListener("clock-in", handleClockEvent);
+      me.removeEventListener("clock-out", handleClockEvent);
+    };
+  }, [date, me]);
+
   const events = useMemo(() => {
-    return attendanceData.attendance.map((entry, index) => ({
-      id: index + 1,
+    if (!report) return [];
+    return report.attendance.map((entry, index) => ({
+      id: index,
       title: entry.title,
       start: new Date(entry.date),
       end: new Date(entry.date),
       allDay: true,
       resource: entry,
     }));
-  }, []);
+  }, [report]);
+
   const eventStyleGetter = (event) => {
     const entry = event.resource;
     return {
@@ -74,6 +129,7 @@ export default function Calendar() {
       },
     };
   };
+
   const EventCard = ({ event }) => {
     const entry = event.resource;
     return (
@@ -96,14 +152,10 @@ export default function Calendar() {
             Work: {minutesToHours(entry.netMinutes)}
           </Typography>
         )}
-        {entry.overtimeMinutes > 0 && (
-          <Typography fontSize={10}>
-            OT: {minutesToHours(entry.overtimeMinutes)}
-          </Typography>
-        )}
       </Box>
     );
   };
+
   return (
     <>
       <GlobalStyles
@@ -174,7 +226,7 @@ export default function Calendar() {
         }}
       />
       <Box>
-        <Accordion sx={{ mb: 1 }}>
+        <Accordion sx={{ mb: 1 }} defaultExpanded>
           <AccordionSummary
             sx={{ width: "100%" }}
             expandIcon={<ExpandMoreIcon />}
@@ -186,67 +238,69 @@ export default function Calendar() {
               justifyContent="space-between"
             >
               <Typography fontSize={"18px !important"} fontWeight={700}>
-                Attendance Calendar
+                {report?.employee?.name || me?.fullName}
               </Typography>
               <Typography variant="body2" color="text.secondary" pr={3}>
-                {attendanceData.employee.name}
-                {" • "}
-                {attendanceData.employee.shift.name}
+                {report?.employee?.shift?.name || me?.shift?.name} [
+                {report?.employee?.shift?.inTime || me?.shift?.startTime}-
+                {report?.employee?.shift?.outTime || me?.shift?.endTime}]
               </Typography>
             </Grid>
           </AccordionSummary>
           <AccordionDetails>
-            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-              {Object.entries(STATUS_LABELS).map(([key, label]) => {
-                const found = attendanceData.attendance.find(
-                  (x) => x.status === key,
-                );
-                return (
-                  <Chip
-                    key={key}
-                    label={label}
-                    size="small"
-                    sx={{
-                      backgroundColor: found?.color || "#e0e0e0",
-                      color: "#fff",
-                      fontWeight: 700,
-                    }}
-                  />
-                );
-              })}
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 2 }}>
+              {Object.entries(STATUS_LABELS).map(([key, label]) => (
+                <Chip
+                  key={key}
+                  label={label}
+                  size="small"
+                  sx={{
+                    backgroundColor: STATUS_COLORS[key] || "#e0e0e0",
+                    color: "#fff",
+                    fontWeight: 700,
+                  }}
+                />
+              ))}
             </Stack>
-            <Box
-              sx={{
-                p: 2,
-                borderRadius: 2,
-                backgroundColor: "#f8fbff",
-                mb: 2,
-              }}
-            >
-              <Typography fontWeight={700} mb={1}>
-                Monthly Summary
-              </Typography>
-              <Divider sx={{ mb: 1 }} />
-              <Stack direction="row" spacing={3} flexWrap="wrap" useFlexGap>
-                <Typography variant="body2">
-                  Present: {attendanceData.summary.present}
+
+            {report && (
+              <Box
+                sx={{
+                  p: 2,
+                  borderRadius: 2,
+                  backgroundColor: "#f8fbff",
+                  mb: 1,
+                }}
+              >
+                <Typography fontWeight={700} mb={1}>
+                  Monthly Summary: {report.summary.month}
                 </Typography>
-                <Typography variant="body2">
-                  Absent: {attendanceData.summary.absent}
-                </Typography>
-                <Typography variant="body2">
-                  Leave: {attendanceData.summary.leave}
-                </Typography>
-                <Typography variant="body2">
-                  OT:{" "}
-                  {minutesToHours(attendanceData.summary.totalOvertimeMinutes)}
-                </Typography>
-                <Typography variant="body2">
-                  Work Hours:{" "}
-                  {minutesToHours(attendanceData.summary.totalWorkingHours)}
-                </Typography>
-              </Stack>
-            </Box>
+                <Divider sx={{ mb: 1 }} />
+                <Stack direction="row" spacing={3} flexWrap="wrap" useFlexGap>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    Present: <span style={{ color: "#4caf50" }}>{report.summary.present}</span>
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    Late: <span style={{ color: "#ff9800" }}>{report.summary.late}</span>
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    Early: <span style={{ color: "#fbc02d" }}>{report.summary.early}</span>
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    Absent: <span style={{ color: "#f44336" }}>{report.summary.absent}</span>
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    Holidays: <span style={{ color: "#d81b60" }}>{report.summary.holiday}</span>
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    Weekly Off: <span style={{ color: "#2196f3" }}>{report.summary.weeklyOff}</span>
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    Work Hours: <span style={{ color: "#1565c0" }}>{minutesToHours(report.summary.totalWorkingHours)}</span>
+                  </Typography>
+                </Stack>
+              </Box>
+            )}
           </AccordionDetails>
         </Accordion>
 
@@ -257,6 +311,8 @@ export default function Calendar() {
           endAccessor="end"
           defaultView="month"
           views={["month"]}
+          date={date}
+          onNavigate={(newDate) => setDate(newDate)}
           popup
           selectable={false}
           style={{

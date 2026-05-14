@@ -17,6 +17,11 @@ router.patch("/me", asyncHandler(async (req, res) => {
     res.json({ status: "success", data: result });
 }));
 
+router.post("/me/finish-onboarding", asyncHandler(async (req, res) => {
+    const result = await userAccountController.finishOnboarding(req.user._id);
+    res.json({ status: "success", ...result });
+}));
+
 router.post("/me/change-password", asyncHandler(async (req, res) => {
     const { currentPassword, newPassword } = req.body;
     const result = await userAccountController.changePassword(req.user._id, currentPassword, newPassword);

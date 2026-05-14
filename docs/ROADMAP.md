@@ -10,24 +10,26 @@
     - [x] Cookie-based JWT Authentication.
     - [x] Multi-tenant Seeding logic.
 
-## Phase 1: Organization & Attendance (Current)
-- [ ] **Organization Setup:**
+## Phase 1: Organization & Attendance (Completed)
+- [x] **Organization Setup:**
     - Branch/Site management with geofence support.
     - Department & Designation configuration.
 - [ ] **Onboarding & ESS:**
     - Mandatory Profile Completion (Bank, Docs, Emergency Contacts).
     - ESS Portal for downloading HR letters and salary slips.
-- [ ] **GPS-Verified Attendance:**
+- [x] **GPS-Verified Attendance:**
     - High-accuracy location capture.
     - Server-side timestamping.
-- [ ] **Admin Verification:**
+- [x] **Admin Verification:**
     - "Check-Marks" workflow for attendance auditing.
 
-## Phase 2: Leave & Holiday Management
-...
-- [ ] **Holiday Calendar:**
+## Phase 2: Leave & Holiday Management (In Progress)
+- [x] **Holiday Calendar:**
     - Tenant-specific holiday lists.
+- [ ] **Holiday View:**
     - Calendar view for employees.
+- [x] **Leave Categories:**
+    - Configuration for leave types and policies.
 - [ ] **Leave Workflow:**
     - Application submission and manager approval hierarchy.
     - Automated balance tracking.

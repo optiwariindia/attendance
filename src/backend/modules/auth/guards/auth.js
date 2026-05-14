@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { HttpError, asyncHandler } from "express-web-tools";
 import { User } from "../models/index.js";
+import shiftModel from "../../attendance/models/Shift.js";
 
 /**
  * Auth Guard
@@ -29,7 +30,9 @@ const auth = asyncHandler(async (req, res, next) => {
     if (user.origin !== req.origin) {
         throw new HttpError(403, "Access denied: Domain mismatch");
     }
-
+    if("shift" in user){
+        let shift=await shiftModel.findById(user.shift);
+    }
     req.user = user;
     next();
 });

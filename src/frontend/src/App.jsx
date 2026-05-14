@@ -7,6 +7,8 @@ import { ThemeProvider } from "@mui/material/styles";
 // import { User, Login, MemberZone } from "./pages";
 
 import { createTheme } from "@mui/material/styles";
+import { Toast } from "./shared/components";
+
 
 const theme = createTheme({
   palette: {
@@ -51,6 +53,7 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <BrowserRouter>
         {user.isLoading ? <>Loading</> : <RouteList user={user} />}
+        <Toast/>
       </BrowserRouter>
     </ThemeProvider>
   );

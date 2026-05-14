@@ -47,8 +47,6 @@ export default function Login() {
             return;
         }
         if ("token" in resp) {
-            localStorage.setItem("token", resp.token);
-
             navigate(0);
             return;
         }

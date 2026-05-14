@@ -125,6 +125,47 @@ Date.prototype.showDate = function (
     return "";
   }
 };
+Date.prototype.showMonthAndYear = function (
+  format = "mmm-yyyy",
+  locale = "default"
+) {
+  const options = {
+    day: "2-digit",
+    month: format.includes("mmmm")
+      ? "long"
+      : format.includes("mmm")
+        ? "short"
+        : "2-digit",
+    year: format.includes("yyyy") ? "numeric" : "2-digit",
+  };
+
+  try {
+    const parts = new Intl.DateTimeFormat(locale, options).formatToParts(this);
+    const map = {};
+    parts.forEach((p) => {
+      if (p.type !== "literal") map[p.type] = p.value;
+    });
+
+    const day = map.day;
+    const year = map.year;
+    const month = map.month;
+
+    return format
+      .replace(/dd/, day)
+      .replace(/mmmm/, month) // full month
+      .replace(/mmm/, month) // short month
+      .replace(
+        /mm/,
+        this.getMonth() + 1 < 10
+          ? "0" + (this.getMonth() + 1)
+          : this.getMonth() + 1
+      )
+      .replace(/yyyy/, year)
+      .replace(/yy/, year.slice(-2));
+  } catch (error) {
+    return "";
+  }
+};
 Date.prototype.toDate = function () {
   return this;
 };

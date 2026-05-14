@@ -2,6 +2,17 @@ import mongoose from "mongoose";
 import { MongooseModel } from "express-web-tools";
 
 const attendanceSchema = new mongoose.Schema({
+    date: {
+        type: String,
+        required: true,
+        validate: {
+            validator: function (v) {
+                return /^\d{4}-\d{2}-\d{2}$/.test(v)
+            },
+            message: props =>
+                `${props.value} is not a valid date format (YYYY-MM-DD)`
+        }
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
@@ -9,21 +20,21 @@ const attendanceSchema = new mongoose.Schema({
     },
     shift: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Shift"
+        ref: "Shift",
+        required: true
     },
     in: {
         time: {
-            type: Date
+            type: Date,
+            default: null
         },
         gps: {
             type: {
                 type: String,
-                enum: ["Point"],
-                default: "Point"
+                enum: ["Point"]
             },
             coordinates: {
-                type: [Number],
-                default: [0, 0]
+                type: [Number]
             }
         },
         gpsAccuracy: {
@@ -32,17 +43,16 @@ const attendanceSchema = new mongoose.Schema({
     },
     out: {
         time: {
-            type: Date
+            type: Date,
+            default: null
         },
         gps: {
             type: {
                 type: String,
-                enum: ["Point"],
-                default: "Point"
+                enum: ["Point"]
             },
             coordinates: {
-                type: [Number],
-                default: [0, 0]
+                type: [Number]
             }
         },
         gpsAccuracy: {
@@ -64,6 +74,14 @@ const attendanceSchema = new mongoose.Schema({
     ],
     remarks: {
         type: String
+    },
+    dayContext: {
+        type: {
+            type: String,
+            enum: ["weekly-off", "leave", "holiday"]
+        },
+        name: String,
+        remarks: String
     }
 });
 
@@ -77,6 +95,9 @@ const attendanceIndexes = [
     ],
     [
         { user: 1, origin: 1, "in.time": -1 }
+    ],
+    [
+        { user: 1, origin: 1, date: 1 }, { unique: true }
     ]
 ];
 

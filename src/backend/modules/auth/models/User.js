@@ -72,7 +72,8 @@ const userSchema = new mongoose.Schema({
     },
     workPolicy: {
         allowOutsideLogin: { type: Boolean, default: false },
-        isWFH: { type: Boolean, default: false }
+        isWFH: { type: Boolean, default: false },
+        weeklyOff: { type: [Number], default: [0] } // 0: Sunday, 1: Monday, etc.
     },
     shift: {
         type: mongoose.Schema.Types.ObjectId,

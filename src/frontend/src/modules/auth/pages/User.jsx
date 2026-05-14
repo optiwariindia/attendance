@@ -204,6 +204,7 @@ function AddUser({ open, user, onClose }) {
       designation: user?.designation ?? "",
       allowOutsideLogin: user?.workPolicy?.allowOutsideLogin ?? false,
       isWFH: user?.workPolicy?.isWFH ?? false,
+      weeklyOff: user?.workPolicy?.weeklyOff ?? [0],
       shift: user?.shift?._id ?? user?.shift ?? "",
       reportingTo: user?.reportingTo?._id ?? user?.reportingTo ?? "",
       leave_to: routing.leave?.to?.join(", ") ?? "",
@@ -266,6 +267,7 @@ function AddUser({ open, user, onClose }) {
             workPolicy: {
               allowOutsideLogin: !!form.allowOutsideLogin,
               isWFH: !!form.isWFH,
+              weeklyOff: form.weeklyOff,
             },
             shift: form.shift || null,
             reportingTo: form.reportingTo || null,
@@ -298,7 +300,7 @@ function AddUser({ open, user, onClose }) {
         sx={ { p: 2 } }
       >
         {/* Section: Basic Information */ }
-        <Grid item size={ 12 }>
+        <Grid size={ 12 }>
           <Typography
             variant="subtitle2"
             color="primary"
@@ -312,7 +314,7 @@ function AddUser({ open, user, onClose }) {
             Basic Information
           </Typography>
         </Grid>
-        <Grid item size={ 4 }>
+        <Grid size={ 4 }>
           <TextField
             label="First Name"
             name="firstName"
@@ -323,7 +325,7 @@ function AddUser({ open, user, onClose }) {
             required
           />
         </Grid>
-        <Grid item size={ 4 }>
+        <Grid size={ 4 }>
           <TextField
             label="Middle Name"
             name="middleName"
@@ -333,7 +335,7 @@ function AddUser({ open, user, onClose }) {
             size="small"
           />
         </Grid>
-        <Grid item size={ 4 }>
+        <Grid size={ 4 }>
           <TextField
             label="Last Name"
             name="lastName"
@@ -344,7 +346,7 @@ function AddUser({ open, user, onClose }) {
             required
           />
         </Grid>
-        <Grid item size={ 6 }>
+        <Grid size={ 6 }>
           <TextField
             label="Email"
             name="email"
@@ -356,7 +358,7 @@ function AddUser({ open, user, onClose }) {
             required
           />
         </Grid>
-        <Grid item size={ 6 }>
+        <Grid size={ 6 }>
           <TextField
             label="Employee ID"
             name="employeeID"
@@ -367,7 +369,7 @@ function AddUser({ open, user, onClose }) {
             required
           />
         </Grid>
-        <Grid item size={ 6 }>
+        <Grid size={ 6 }>
           <PhoneField
             label="Phone Number"
             defaultCountry="IN"
@@ -377,7 +379,7 @@ function AddUser({ open, user, onClose }) {
             }
           />
         </Grid>
-        <Grid item size={ 6 }>
+        <Grid size={ 6 }>
           <TextField
             select
             label="Gender"
@@ -412,7 +414,7 @@ function AddUser({ open, user, onClose }) {
         </Grid>
 
         {/* Section: Employment Details */ }
-        <Grid item size={ 12 }>
+        <Grid size={ 12 }>
           <Typography
             variant="subtitle2"
             color="primary"
@@ -427,7 +429,7 @@ function AddUser({ open, user, onClose }) {
             Employment & Work Policy
           </Typography>
         </Grid>
-        <Grid item size={ 6 }>
+        <Grid size={ 6 }>
           <Autocomplete
             options={ roles }
             value={ roles.find((r) => r.name === form.role) || null }
@@ -457,7 +459,7 @@ function AddUser({ open, user, onClose }) {
             ) }
           />
         </Grid>
-        <Grid item size={ 6 }>
+        <Grid size={ 6 }>
           <Autocomplete
             options={ branches }
             value={ branches.find((b) => b._id === form.branch) || null }
@@ -487,7 +489,7 @@ function AddUser({ open, user, onClose }) {
             ) }
           />
         </Grid>
-        <Grid item size={ 6 }>
+        <Grid size={ 6 }>
           <TextField
             select
             label="Work Status"
@@ -529,7 +531,7 @@ function AddUser({ open, user, onClose }) {
             )) }
           </TextField>
         </Grid>
-        <Grid item size={ 6 }>
+        <Grid size={ 6 }>
           <Autocomplete
             options={ users }
             value={ users.find((u) => u._id === form.reportingTo) || null }
@@ -561,7 +563,7 @@ function AddUser({ open, user, onClose }) {
             ) }
           />
         </Grid>
-        <Grid item size={ 6 }>
+        <Grid size={ 6 }>
           <Autocomplete
             options={ departments }
             onChange={ async (e, d) => {
@@ -596,7 +598,7 @@ function AddUser({ open, user, onClose }) {
             ) }
           />
         </Grid>
-        <Grid item size={ 6 }>
+        <Grid size={ 6 }>
           <Autocomplete
             options={ designations }
             onChange={ async (e, d) => {
@@ -624,7 +626,7 @@ function AddUser({ open, user, onClose }) {
             ) }
           />
         </Grid>
-        <Grid item size={ 6 }>
+        <Grid size={ 6 }>
           <Autocomplete
             options={ shifts }
             value={ shifts.find((s) => s._id === form.shift) || null }
@@ -655,7 +657,55 @@ function AddUser({ open, user, onClose }) {
           />
         </Grid>
 
-        <Grid item size={ 3 } sx={ { display: "flex", alignItems: "center" } }>
+        <Grid size={ 6 }>
+          <Autocomplete
+            multiple
+            options={ [
+              { label: "Sunday", value: 0 },
+              { label: "Monday", value: 1 },
+              { label: "Tuesday", value: 2 },
+              { label: "Wednesday", value: 3 },
+              { label: "Thursday", value: 4 },
+              { label: "Friday", value: 5 },
+              { label: "Saturday", value: 6 },
+            ] }
+            value={ [
+              { label: "Sunday", value: 0 },
+              { label: "Monday", value: 1 },
+              { label: "Tuesday", value: 2 },
+              { label: "Wednesday", value: 3 },
+              { label: "Thursday", value: 4 },
+              { label: "Friday", value: 5 },
+              { label: "Saturday", value: 6 },
+            ].filter((d) => form.weeklyOff?.includes(d.value)) }
+            isOptionEqualToValue={ (option, value) => option.value === value.value }
+            getOptionLabel={ (option) => option.label }
+            onChange={ (e, d) => {
+              setForm({
+                ...form,
+                weeklyOff: d.map((x) => x.value),
+              });
+            } }
+            slotProps={ {
+              popper: {
+                sx: {
+                  zIndex: 99999,
+                },
+              },
+            } }
+            renderInput={ (params) => (
+              <TextField
+                { ...params }
+                label="Weekly Off"
+                name="weeklyOff"
+                fullWidth
+                size="small"
+              />
+            ) }
+          />
+        </Grid>
+
+        <Grid size={ 3 } sx={ { display: "flex", alignItems: "center" } }>
           <label style={ { fontSize: "0.85rem" } }>
             <input
               type="checkbox"
@@ -667,7 +717,7 @@ function AddUser({ open, user, onClose }) {
             Outside Login
           </label>
         </Grid>
-        <Grid item size={ 3 } sx={ { display: "flex", alignItems: "center" } }>
+        <Grid size={ 3 } sx={ { display: "flex", alignItems: "center" } }>
           <label style={ { fontSize: "0.85rem" } }>
             <input
               type="checkbox"
@@ -681,7 +731,7 @@ function AddUser({ open, user, onClose }) {
         </Grid>
 
         {/* Section: Routing Settings */ }
-        <Grid item size={ 12 }>
+        <Grid size={ 12 }>
           <Typography
             variant="subtitle2"
             color="primary"
@@ -698,12 +748,12 @@ function AddUser({ open, user, onClose }) {
         </Grid>
 
         {/* Leave Routing */ }
-        <Grid item size={ 12 }>
+        <Grid size={ 12 }>
           <Typography variant="caption" sx={ { fontWeight: "bold" } }>
             LEAVE APPLICATIONS
           </Typography>
         </Grid>
-        <Grid item size={ 4 }>
+        <Grid size={ 4 }>
           <TextField
             label="To"
             name="leave_to"
@@ -714,7 +764,7 @@ function AddUser({ open, user, onClose }) {
             placeholder="email1, email2"
           />
         </Grid>
-        <Grid item size={ 4 }>
+        <Grid size={ 4 }>
           <TextField
             label="CC"
             name="leave_cc"
@@ -724,7 +774,7 @@ function AddUser({ open, user, onClose }) {
             size="small"
           />
         </Grid>
-        <Grid item size={ 4 }>
+        <Grid size={ 4 }>
           <TextField
             label="BCC"
             name="leave_bcc"
@@ -736,12 +786,12 @@ function AddUser({ open, user, onClose }) {
         </Grid>
 
         {/* Finance Routing */ }
-        <Grid item size={ 12 } sx={ { mt: 1 } }>
+        <Grid size={ 12 } sx={ { mt: 1 } }>
           <Typography variant="caption" sx={ { fontWeight: "bold" } }>
             FINANCE ENQUIRIES
           </Typography>
         </Grid>
-        <Grid item size={ 4 }>
+        <Grid size={ 4 }>
           <TextField
             label="To"
             name="finance_to"
@@ -751,7 +801,7 @@ function AddUser({ open, user, onClose }) {
             size="small"
           />
         </Grid>
-        <Grid item size={ 4 }>
+        <Grid size={ 4 }>
           <TextField
             label="CC"
             name="finance_cc"
@@ -761,7 +811,7 @@ function AddUser({ open, user, onClose }) {
             size="small"
           />
         </Grid>
-        <Grid item size={ 4 }>
+        <Grid size={ 4 }>
           <TextField
             label="BCC"
             name="finance_bcc"
@@ -773,12 +823,12 @@ function AddUser({ open, user, onClose }) {
         </Grid>
 
         {/* IT Routing */ }
-        <Grid item size={ 12 } sx={ { mt: 1 } }>
+        <Grid size={ 12 } sx={ { mt: 1 } }>
           <Typography variant="caption" sx={ { fontWeight: "bold" } }>
             IT ENQUIRIES
           </Typography>
         </Grid>
-        <Grid item size={ 4 }>
+        <Grid size={ 4 }>
           <TextField
             label="To"
             name="it_to"
@@ -788,7 +838,7 @@ function AddUser({ open, user, onClose }) {
             size="small"
           />
         </Grid>
-        <Grid item size={ 4 }>
+        <Grid size={ 4 }>
           <TextField
             label="CC"
             name="it_cc"
@@ -798,7 +848,7 @@ function AddUser({ open, user, onClose }) {
             size="small"
           />
         </Grid>
-        <Grid item size={ 4 }>
+        <Grid size={ 4 }>
           <TextField
             label="BCC"
             name="it_bcc"

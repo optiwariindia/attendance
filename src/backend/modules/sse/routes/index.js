@@ -69,9 +69,9 @@ class SSE {
         connections.add(res);
 
         // Send initial connection state and server time
-        this.sendToClient(res, "connected", { 
-            connected: true, 
-            serverTime: new Date().toISOString() 
+        this.sendToClient(res, "connected", {
+            connected: true,
+            serverTime: new Date().toISOString()
         });
 
         req.on("close", () => {
@@ -133,5 +133,12 @@ setInterval(() => {
 
 router.get("/", authGuard, (req, res) => sse.subscribe(req, res));
 
+
+eventStream.addListener("marked-in", (e) => {
+    sse.publish("clock-in", e.attendance, e);
+})
+eventStream.addListener("marked-out", (e) => {
+    sse.publish("clock-out", e.attendance, e);
+})
 export { sse };
 export default router;
