@@ -26,13 +26,14 @@
 ## Phase 2: Leave & Holiday Management (In Progress)
 - [x] **Holiday Calendar:**
     - Tenant-specific holiday lists.
-- [ ] **Holiday View:**
-    - Calendar view for employees.
+- [x] **Holiday View:**
+    - Calendar view for employees with future visibility.
 - [x] **Leave Categories:**
     - Configuration for leave types and policies.
 - [ ] **Leave Workflow:**
-    - Application submission and manager approval hierarchy.
-    - Automated balance tracking.
+    - [x] Data Models: Application snapshots and Balance tracking.
+    - [ ] Application submission and manager approval hierarchy.
+    - [ ] Automated balance tracking logic.
 
 ## Phase 3: Reporting & Analytics
 - [ ] **Automated Reports:**

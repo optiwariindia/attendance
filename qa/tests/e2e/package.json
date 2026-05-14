@@ -1,0 +1,17 @@
+{
+  "name": "frfs-attendance-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Black-box Playwright E2E tests for the FRFS Attendance website.",
+  "scripts": {
+    "e2e": "playwright test",
+    "e2e:headed": "playwright test --headed",
+    "e2e:ui": "playwright test --ui",
+    "e2e:install": "playwright install chromium firefox",
+    "e2e:report": "playwright show-report",
+    "e2e:docker": "docker compose -f docker-compose.e2e.yml run --rm playwright"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.53.0"
+  }
+}
