@@ -18,7 +18,7 @@ To ensure the integrity of our workforce data and the accuracy of our reporting 
 Furthermore, the new architecture is not backward compatible in all respects due to these significant enhancements. Attempting to "patch" the old server would lead to data inconsistencies and system failures because the legacy database cannot support these advanced modules. 
 
 **Deployment Strategy Update:**
-- **Current Access:** I have installed the new system on **https://new-attendance.frequentresearch.com** for initial access and validation.
+- **Current Access:** I have configured the new system on **https://new-attendance.frequentresearch.com**. Please note that a final server restart is required to publish it on the web, after which the link will be fully accessible.
 - **Credential Parity:** I am using the **same credentials** as the current system, so everyone can log in and access the platform immediately without needing new passwords.
 - **Go-Live Trigger:** We shall move the platform to the primary domain (**https://attendance.frequentresearch.com**) only once:
     1.  All **historical data** has been successfully migrated.

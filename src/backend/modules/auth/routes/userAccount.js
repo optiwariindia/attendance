@@ -37,6 +37,12 @@ router.get("/users", adminPermission("view"), asyncHandler(async (req, res) => {
     res.json({ status: "success", data: result });
 }));
 
+router.put("/users", adminPermission("manage"), asyncHandler(async (req, res) => {
+    userAccountController.request = req;
+    const result = await userAccountController.create(req.body);
+    res.status(201).json({ status: "success", data: result });
+}));
+
 router.patch("/users/:userId", adminPermission("manage"), asyncHandler(async (req, res) => {
     const result = await userAccountController.updateUserDetails(req.params.userId, req.body);
     res.json({ status: "success", data: result });

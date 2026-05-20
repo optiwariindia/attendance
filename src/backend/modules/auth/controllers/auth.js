@@ -14,7 +14,7 @@ class Auth extends CrudController {
         }
 
         const user = await User.findOne({
-            $or: [{ email: username }, { employeeID: username }],
+            $or: [{ email: username.toLowerCase() }, { employeeID: username.toUpperCase() }],
             origin,
             isDeleted: false
         });
@@ -31,7 +31,7 @@ class Auth extends CrudController {
         const token = jwt.sign(
             { id: user._id, role: user.role, origin: user.origin },
             process.env.JWT_SECRET,
-            { expiresIn: "1d" }
+            { expiresIn: "30d" }
         );
 
         const userData = {
@@ -43,11 +43,11 @@ class Auth extends CrudController {
         };
 
         // Emit login event
-        eventStream.emit("auth.login", { 
-            userId: user._id, 
-            employeeID: user.employeeID, 
-            origin, 
-            user: userData 
+        eventStream.emit("auth.login", {
+            userId: user._id,
+            employeeID: user.employeeID,
+            origin,
+            user: userData
         });
 
         return {
@@ -98,10 +98,10 @@ class Auth extends CrudController {
     async logout(user, origin) {
         // Emit logout event
         if (user && origin) {
-            eventStream.emit("auth.logout", { 
-                userId: user._id, 
-                employeeID: user.employeeID, 
-                origin 
+            eventStream.emit("auth.logout", {
+                userId: user._id,
+                employeeID: user.employeeID,
+                origin
             });
         }
         return { message: "Logged out successfully" };

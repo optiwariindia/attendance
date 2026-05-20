@@ -8,30 +8,30 @@ const { useUser } = Shared.Context.User;
 const { useGPS } = Shared.Hook;
 
 const announcements = [
-  {
-    id: 1,
-    title: "Office Maintenance",
-    message: "Server maintenance scheduled tonight from 11 PM to 1 AM.",
-    createdAt: "2026-05-08T09:30:00",
-  },
-  {
-    id: 2,
-    title: "Holiday Notice",
-    message: "Office will remain closed on Friday due to public holiday.",
-    createdAt: "2026-05-09T15:45:00",
-  },
-  {
-    id: 3,
-    title: "Team Meeting",
-    message: "Monthly team sync scheduled tomorrow at 10:00 AM.",
-    createdAt: "2026-05-10T18:15:00",
-  },
-  {
-    id: 4,
-    title: "Attendance Reminder",
-    message: "Please ensure clock-in before 9:30 AM daily.",
-    createdAt: "2026-05-11T08:10:00",
-  },
+  // {
+  //   id: 1,
+  //   title: "Office Maintenance",
+  //   message: "Server maintenance scheduled tonight from 11 PM to 1 AM.",
+  //   createdAt: "2026-05-08T09:30:00",
+  // },
+  // {
+  //   id: 2,
+  //   title: "Holiday Notice",
+  //   message: "Office will remain closed on Friday due to public holiday.",
+  //   createdAt: "2026-05-09T15:45:00",
+  // },
+  // {
+  //   id: 3,
+  //   title: "Team Meeting",
+  //   message: "Monthly team sync scheduled tomorrow at 10:00 AM.",
+  //   createdAt: "2026-05-10T18:15:00",
+  // },
+  // {
+  //   id: 4,
+  //   title: "Attendance Reminder",
+  //   message: "Please ensure clock-in before 9:30 AM daily.",
+  //   createdAt: "2026-05-11T08:10:00",
+  // },
 ];
 
 export default function Dashboard() {
@@ -214,13 +214,13 @@ export default function Dashboard() {
 
       <Grid
         size={{ xs: 12, md: 9 }}
-        sx={{ borderRadius: 2, overflow: "hidden", mt: 2 }}
+        sx={{ borderRadius: 2, overflow: "hidden"}}
       >
         <Calendar />
       </Grid>
       <Grid
         size={{ xs: 12, md: 3 }}
-        sx={{ borderRadius: 2, bgcolor: "#e3f2fd", overflow: "hidden", mt: 2 }}
+        sx={{ borderRadius: 2, bgcolor: "#e3f2fd", overflow: "hidden" }}
       >
         <Typography
           fontSize={18}
@@ -272,7 +272,6 @@ export default function Dashboard() {
                     borderBottom: "1px solid #ffffff",
                     bgcolor: "white",
                     borderRadius: 2,
-                    mb: 1,
                   }}
                 >
                   <Typography fontWeight={600} fontSize={13}>

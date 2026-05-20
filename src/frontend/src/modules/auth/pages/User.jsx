@@ -293,7 +293,7 @@ function AddUser({ open, user, onClose }) {
           if (form._id) {
             await api.patch(`/api/v1/auth/users/${form._id}`, payload);
           } else {
-            await api.patch(`/api/v1/auth/users`, payload);
+            await api.put(`/api/v1/auth/users`, payload);
           }
           onClose();
         } }

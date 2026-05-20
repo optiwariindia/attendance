@@ -11,7 +11,10 @@ class AttendanceController extends CrudController {
         super(Attendance);
     }
     async list(query = {}, populateFields = null, sort = {}, project = null) {
-        populateFields = "shift"
+        if (populateFields === null)
+            populateFields = `shift`
+        else
+            populateFields = `${populateFields} shift`
         return super.list(query, populateFields, sort, project)
     }
 
@@ -104,7 +107,7 @@ class AttendanceController extends CrudController {
             const record = attendanceMap.get(dateStr);
             const holiday = holidayMap.get(dateStr);
             const isWeeklyOff = report.employee.weeklyOff.includes(d.getDay());
-            
+
             // If no record exists for this day, we only show it if it's a FUTURE holiday or weekly-off
             if (!record && !(dateStr > todayStr && (holiday || isWeeklyOff))) continue;
 
@@ -124,9 +127,9 @@ class AttendanceController extends CrudController {
                         "holiday": { status: "HOLIDAY", color: "#d81b60", title: ctx.name || "Holiday" },
                         "leave": { status: "LEAVE", color: "#9c27b0", title: ctx.name || "Leave" }
                     };
-                    
+
                     const meta = statusMap[ctx.type] || { status: "OTHER", color: "#9e9e9e", title: ctx.name || "Off Day" };
-                    
+
                     dayEntries.push({
                         date: dateStr,
                         status: meta.status,
@@ -155,7 +158,7 @@ class AttendanceController extends CrudController {
 
                 const inMins = dateTimeToMinutes(record.in.time);
                 const shiftInMins = timeToMinutes(shift?.startTime);
-                
+
                 if (shift) {
                     const lateGrace = shift.gracePeriod?.in || 0;
                     if (inMins > shiftInMins + lateGrace) {
@@ -183,11 +186,11 @@ class AttendanceController extends CrudController {
 
                 if (record.out?.time) {
                     if (dayData.status === "PRESENT") report.summary.present++;
-                    
+
                     const diffMs = new Date(record.out.time) - new Date(record.in.time);
                     const gross = Math.round(diffMs / 60000);
                     const breakMins = record.break.reduce((acc, b) => acc + getSafeDuration(b.duration, gross), 0);
-                    
+
                     dayData.grossMinutes = gross;
                     dayData.breakMinutes = breakMins;
                     dayData.netMinutes = Math.max(0, gross - breakMins);
@@ -259,15 +262,15 @@ class AttendanceController extends CrudController {
                     attendance.in.gpsAccuracy = gps?.accuracy
                     break;
                 }
-                if(!attendance.out.time){
-                    throw new HttpError(402,"Duplicate entry, mark out first");
+                if (!attendance.out.time) {
+                    throw new HttpError(402, "Duplicate entry, mark out first");
                 }
                 attendance.break.push({
                     start: attendance.out.time,
                     end: new Date(),
                     duration: Math.round((new Date() - new Date(attendance.out.time)) / (1000 * 60))
                 });
-                attendance.out.time=null;
+                attendance.out.time = null;
                 // todo: Add break policy
                 break;
             case "out":

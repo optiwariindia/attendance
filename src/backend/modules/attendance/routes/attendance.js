@@ -20,6 +20,28 @@ function getToday(shift, action = "in") {
 }
 const router = express.Router();
 router
+    .route("/")
+    .get(AuthGuard, asyncHandler(
+        async (req, res) => {
+            controller.request = req;
+            const data = await controller.list({},"user")
+            return res.json({
+                status: "success",
+                data
+            })
+        }
+    ))
+    .post(AuthGuard, asyncHandler(
+        async (req, res) => {
+            controller.request = req;
+            const data = await controller.list(req.body)
+            return res.json({
+                status: "success",
+                data
+            })
+        }
+    ))
+router
     .route('/my')
     .get(AuthGuard, asyncHandler(async (req, res) => {
         controller.request = req;
@@ -54,7 +76,7 @@ router
         const now = new Date();
         const rYear = parseInt(year) || now.getFullYear();
         const rMonth = parseInt(month) || (now.getMonth() + 1);
-        
+
         const data = await controller.getReport(req.user._id, rYear, rMonth);
         return res.json({
             status: "success",

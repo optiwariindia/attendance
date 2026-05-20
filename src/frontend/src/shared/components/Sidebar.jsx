@@ -194,7 +194,7 @@ function Sidebar({ children }) {
         sidenav.push({
             name: "Reports",
             icon: "fas fa-chart-bar",
-            link: "/admin/report",
+            link: "/admin/attendance",
             // submenu: [
             //   { name: "Daily Report", link: "/reports/daily" },
             //   { name: "Monthly Report", link: "/reports/monthly" },

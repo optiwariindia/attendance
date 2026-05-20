@@ -29,17 +29,18 @@ const { Datatable, SectionTitle } = Shared.Components;
 
 export default function Leave() {
   const [creatingLeave, setCreatingLeave] = React.useState(false);
-  const [activeLeave, setActiveLeave] = React.useState(true);
-  const [data, setData] = React.useState([
-    {
-      requestDate: "2026-01-01",
-      type: "sick",
-      from: "2026-01-10",
-      to: "2026-01-12",
-      duration: 3,
-      status: "approved",
-    },
-  ]);
+  const [activeLeave, setActiveLeave] = React.useState(false);
+  const [data, setData] = React.useState(null);
+  //  ( [
+  //   {
+  //     requestDate: "2026-01-01",
+  //     type: "sick",
+  //     from: "2026-01-10",
+  //     to: "2026-01-12",
+  //     duration: 3,
+  //     status: "approved",
+  //   },
+  // ]);
 
   const [confirm, setConfirm] = React.useState({
     anchorEl: null,
@@ -55,7 +56,7 @@ export default function Leave() {
     closeConfirm();
   };
 
-  const handleDelete = async (index) => { };
+  const handleDelete = async (index) => {};
 
   const columns = [
     {
@@ -94,7 +95,7 @@ export default function Leave() {
       width: 130,
       render: (d) => (
         <Chip
-          label={ d.status }
+          label={d.status}
           color={
             d.status === "approved"
               ? "success"
@@ -103,7 +104,7 @@ export default function Leave() {
                 : "default"
           }
           size="small"
-          sx={ { textTransform: "capitalize" } }
+          sx={{ textTransform: "capitalize" }}
         />
       ),
     },
@@ -112,26 +113,26 @@ export default function Leave() {
       label: "Actions",
       width: 130,
       render: (d) => (
-        <Box display={ "flex" } alignItems={ "center" } gap={ 0.5 }>
+        <Box display={"flex"} alignItems={"center"} gap={0.5}>
           <IconButton
-            onClick={ (e) => { } }
+            onClick={(e) => {}}
             title="Edit"
             color="info"
-            sx={ { fontSize: 18 } }
+            sx={{ fontSize: 18 }}
           >
             <i className="fas fa-pen-to-square"></i>
           </IconButton>
           <IconButton
-            onClick={ (event) => {
+            onClick={(event) => {
               event.stopPropagation();
               setConfirm({
                 anchorEl: event.currentTarget,
                 d,
               });
-            } }
+            }}
             title="Delete"
             color="error"
-            sx={ { fontSize: 18 } }
+            sx={{ fontSize: 18 }}
           >
             <i className="fas fa-trash"></i>
           </IconButton>
@@ -141,52 +142,53 @@ export default function Leave() {
   ];
   return (
     <>
-      { creatingLeave ? (
+      {creatingLeave ? (
         <CreateLeaveRequest
-          onBack={ () => {
+          onBack={() => {
             setCreatingLeave(false);
-          } }
+          }}
+          setActiveLeave={setActiveLeave}
         />
       ) : (
         <>
-          { activeLeave ? (
+          {activeLeave ? (
             <>
-              { " " }
-              <Box mt={ -1 } px={ { xs: 0, sm: 2 } }>
+              {" "}
+              <Box mt={-1} px={{ xs: 0, sm: 2 }}>
                 <Datatable
                   extra={
-                    <Box px={ { xs: 0, md: 2 } } my={ { xs: 1, md: 0 } }>
+                    <Box px={{ xs: 0, md: 2 }} my={{ xs: 1, md: 0 }}>
                       <Button
-                        onClick={ () => {
+                        onClick={() => {
                           setCreatingLeave(true);
-                        } }
+                        }}
                         variant="contained"
                         color="primary"
-                        sx={ { textTransform: "none", py: 0.4 } }
+                        sx={{ textTransform: "none", py: 0.4 }}
                       >
                         <i
                           className="fa-solid fa-plus"
-                          style={ { marginRight: 8 } }
+                          style={{ marginRight: 8 }}
                         />
                         Apply
                       </Button>
                     </Box>
                   }
                   title="My Leaves"
-                  isLoading={ false }
-                  pagination={ [10, 20, 50, 100] }
-                  pageSize={ 20 }
-                  columns={ columns }
-                  data={ data }
+                  isLoading={false}
+                  pagination={[10, 20, 50, 100]}
+                  pageSize={20}
+                  columns={columns}
+                  data={data}
                 />
               </Box>
               <Popover
-                open={ openConfirm }
-                anchorEl={ confirm.anchorEl }
-                onClose={ closeConfirm }
-                anchorOrigin={ { vertical: "bottom", horizontal: "bottom" } }
-                transformOrigin={ { vertical: "top", horizontal: "center" } }
-                PaperProps={ {
+                open={openConfirm}
+                anchorEl={confirm.anchorEl}
+                onClose={closeConfirm}
+                anchorOrigin={{ vertical: "bottom", horizontal: "bottom" }}
+                transformOrigin={{ vertical: "top", horizontal: "center" }}
+                PaperProps={{
                   sx: {
                     px: 2,
                     py: 1,
@@ -194,17 +196,17 @@ export default function Leave() {
                     alignItems: "center",
                     borderRadius: "10px",
                   },
-                } }
+                }}
               >
-                <Box sx={ { mr: 1.5, fontWeight: 600 } }>Confirm Delete?</Box>
+                <Box sx={{ mr: 1.5, fontWeight: 600 }}>Confirm Delete?</Box>
 
                 <IconButton
                   color="success"
                   size="small"
-                  onClick={ confirmDelete }
-                  sx={ {
+                  onClick={confirmDelete}
+                  sx={{
                     "&:hover": { bgcolor: "success.light", color: "white" },
-                  } }
+                  }}
                 >
                   <CheckIcon fontSize="small" />
                 </IconButton>
@@ -212,64 +214,65 @@ export default function Leave() {
                 <IconButton
                   color="error"
                   size="small"
-                  onClick={ closeConfirm }
-                  sx={ {
+                  onClick={closeConfirm}
+                  sx={{
                     ml: 0.5,
                     "&:hover": { bgcolor: "error.light", color: "white" },
-                  } }
+                  }}
                 >
                   <ClearIcon fontSize="small" />
                 </IconButton>
               </Popover>
             </>
           ) : (
-            <Grid size={ 12 } container spacing={ 2 } px={ 2 }>
-              { " " }
+            <Grid size={12} container spacing={2} px={2}>
+              {" "}
               <Grid
-                size={ 12 }
+                size={12}
                 container
-                justifyContent={ "space-between" }
-                alignItems={ "center" }
+                justifyContent={"space-between"}
+                alignItems={"center"}
               >
-                <Typography fontSize={ 20 } fontWeight={ 600 }>
+                <Typography fontSize={20} fontWeight={600}>
                   Manage Leave
                 </Typography>
                 <Button
-                  onClick={ () => {
+                  onClick={() => {
                     setCreatingLeave(true);
-                  } }
+                  }}
                   variant="contained"
                   color="primary"
-                  sx={ { borderRadius: 12, textTransform: "none" } }
+                  size ="small"
+                  sx={{ borderRadius: 12, textTransform: "none", px: 1.5 }}
                 >
-                  <i className="fa-solid fa-plus" style={ { marginRight: 8 } } />
+                  <i className="fa-solid fa-plus" style={{ marginRight: 8 }} />
                   Create Leave Request
                 </Button>
               </Grid>
               <Grid
-                size={ 12 }
+                size={12}
                 container
-                justifyContent={ "center" }
-                alignItems={ "center" }
-                sx={ {
+                justifyContent={"center"}
+                alignItems={"center"}
+                sx={{
                   height: 200,
                   bgcolor: "#f4f4f4",
                   borderRadius: 2,
                   border: "1px solid #cecece",
                   color: "#777",
-                } }
+                }}
               >
                 No Active or Past Leave Request
               </Grid>
             </Grid>
-          ) }
+          )}
         </>
-      ) }
+      )}
     </>
   );
 }
 
-function CreateLeaveRequest({ onBack }) {
+function CreateLeaveRequest({ onBack, setActiveLeave }) {
   const [inputs, setInputs] = React.useState({
     to: [],
     type: "",
@@ -339,17 +342,18 @@ function CreateLeaveRequest({ onBack }) {
     });
 
     console.log([...formData.entries()]);
+    setActiveLeave(true);
   };
 
   return (
-    <LocalizationProvider dateAdapter={ AdapterDayjs }>
-      <Grid size={ 12 } px={ 2 }>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <Grid size={12} px={2}>
         <Grid
-          size={ 12 }
-          sx={ { borderRadius: 3, boxShadow: 2, bgcolor: "white" } }
+          size={12}
+          sx={{ borderRadius: 3, boxShadow: 2, bgcolor: "white" }}
         >
           <SectionTitle
-            sx={ {
+            sx={{
               justifyContent: { xs: "flex-start", sm: "center" },
               alignItems: "center",
               height: { sm: 50 },
@@ -357,19 +361,19 @@ function CreateLeaveRequest({ onBack }) {
               gap: { xs: 3, sm: 0 },
               p: 1,
               px: { md: 2 },
-            } }
+            }}
           >
             <IconButton
-              onClick={ onBack }
-              sx={ { display: { xs: "flex", sm: "none" }, p: 0 } }
+              onClick={onBack}
+              sx={{ display: { xs: "flex", sm: "none" }, p: 0 }}
             >
               <ArrowBackIcon />
             </IconButton>
-            <Box sx={ { display: { xs: "none", sm: "inline" } } }>
+            <Box sx={{ display: { xs: "none", sm: "inline" } }}>
               <Button
                 aria-label="Back Button"
-                startIcon={ <ArrowBackIcon /> }
-                sx={ {
+                startIcon={<ArrowBackIcon />}
+                sx={{
                   bgcolor: "whitesmoke",
                   color: "black",
                   borderRadius: 2,
@@ -379,110 +383,110 @@ function CreateLeaveRequest({ onBack }) {
                   "&:hover": {
                     boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
                   },
-                } }
-                onClick={ onBack }
+                }}
+                onClick={onBack}
               >
                 Back
               </Button>
             </Box>
             <Typography
-              fontSize={ { xs: 16, md: 18 } }
-              fontWeight={ 600 }
-              sx={ {
+              fontSize={{ xs: 16, md: 18 }}
+              fontWeight={600}
+              sx={{
                 flex: { sm: 1 },
                 textAlign: "center",
                 marginLeft: { xs: "15px", md: "-110px" },
-              } }
+              }}
             >
               Leave Application Form
             </Typography>
           </SectionTitle>
 
-          <Grid container size={ 12 } spacing={ { xs: 1, md: 2 } } p={ 2 }>
+          <Grid container size={12} spacing={{ xs: 1, md: 2 }} p={2}>
             <Grid
-              size={ { xs: 12, md: 6 } }
+              size={{ xs: 12, md: 6 }}
               container
               direction="column"
-              spacing={ 0 }
+              spacing={0}
             >
               <Typography
-                fontSize={ 14 }
-                fontWeight={ 600 }
-                pl={ 0.5 }
+                fontSize={14}
+                fontWeight={600}
+                pl={0.5}
                 color="#063686"
               >
-                Send Application To<span style={ { color: "red" } }>*</span>
+                Send Application To<span style={{ color: "red" }}>*</span>
               </Typography>
               <Autocomplete
                 size="small"
                 multiple
-                options={ sendToOptions }
-                value={ sendToOptions.filter((opt) =>
-                  inputs.to.includes(opt.value)
-                ) }
-                onChange={ (event, newValue) => {
+                options={sendToOptions}
+                value={sendToOptions.filter((opt) =>
+                  inputs.to.includes(opt.value),
+                )}
+                onChange={(event, newValue) => {
                   setInputs((prev) => ({
                     ...prev,
                     to: newValue.map((opt) => opt.value),
                   }));
-                } }
-                getOptionLabel={ (option) => option.label }
-                renderInput={ (params) => (
-                  <TextField { ...params } placeholder="Select recipient" />
-                ) }
+                }}
+                getOptionLabel={(option) => option.label}
+                renderInput={(params) => (
+                  <TextField {...params} placeholder="Select recipient" />
+                )}
               />
-            </Grid>{ " " }
+            </Grid>{" "}
             <Grid
-              size={ { xs: 12, md: 6 } }
+              size={{ xs: 12, md: 6 }}
               container
               direction="column"
-              spacing={ 0 }
+              spacing={0}
             >
               <Typography
-                fontSize={ 14 }
-                fontWeight={ 600 }
-                pl={ 0.5 }
+                fontSize={14}
+                fontWeight={600}
+                pl={0.5}
                 color="#063686"
               >
-                Leave Type<span style={ { color: "red" } }>*</span>
+                Leave Type<span style={{ color: "red" }}>*</span>
               </Typography>
               <Autocomplete
                 size="small"
-                options={ leaveOptions }
+                options={leaveOptions}
                 value={
                   leaveOptions.find((opt) => opt.value === inputs.type) || null
                 }
-                onChange={ (event, newValue) => {
+                onChange={(event, newValue) => {
                   setInputs((prev) => ({
                     ...prev,
                     type: newValue ? newValue.value : "",
                   }));
-                } }
-                getOptionLabel={ (option) => option.label }
-                renderInput={ (params) => (
-                  <TextField { ...params } placeholder="Select Leave Type" />
-                ) }
+                }}
+                getOptionLabel={(option) => option.label}
+                renderInput={(params) => (
+                  <TextField {...params} placeholder="Select Leave Type" />
+                )}
               />
             </Grid>
             <Grid
-              size={ { xs: 12, md: 4 } }
+              size={{ xs: 12, md: 4 }}
               container
               direction="column"
-              spacing={ 0 }
-              sx={ { maxWidth: 170 } }
+              spacing={0}
+              sx={{ maxWidth: 170 }}
             >
               <Typography
-                fontSize={ 14 }
-                fontWeight={ 600 }
-                pl={ 0.5 }
+                fontSize={14}
+                fontWeight={600}
+                pl={0.5}
                 color="#063686"
               >
-                From<span style={ { color: "red" } }>*</span>
+                From<span style={{ color: "red" }}>*</span>
               </Typography>
               <DatePicker
                 disablePast
-                value={ inputs.period.from }
-                onChange={ (newValue) => {
+                value={inputs.period.from}
+                onChange={(newValue) => {
                   setInputs((prev) => ({
                     ...prev,
                     period: {
@@ -490,40 +494,40 @@ function CreateLeaveRequest({ onBack }) {
                       from: newValue,
                       to:
                         prev.period.to &&
-                          newValue &&
-                          prev.period.to.isBefore(newValue)
+                        newValue &&
+                        prev.period.to.isBefore(newValue)
                           ? null
                           : prev.period.to,
                     },
                   }));
-                } }
-                slotProps={ {
+                }}
+                slotProps={{
                   textField: {
                     size: "small",
                   },
-                } }
+                }}
               />
             </Grid>
             <Grid
-              size={ { xs: 12, md: 4 } }
+              size={{ xs: 12, md: 4 }}
               container
               direction="column"
-              spacing={ 0 }
-              sx={ { maxWidth: 170 } }
+              spacing={0}
+              sx={{ maxWidth: 170 }}
             >
               <Typography
-                fontSize={ 14 }
-                fontWeight={ 600 }
-                pl={ 0.5 }
+                fontSize={14}
+                fontWeight={600}
+                pl={0.5}
                 color="#063686"
               >
-                Until<span style={ { color: "red" } }>*</span>
+                Until<span style={{ color: "red" }}>*</span>
               </Typography>
               <DatePicker
                 size="small"
-                value={ inputs.period.to }
-                minDate={ inputs.period.from }
-                onChange={ (newValue) => {
+                value={inputs.period.to}
+                minDate={inputs.period.from}
+                onChange={(newValue) => {
                   setInputs((prev) => ({
                     ...prev,
                     period: {
@@ -531,52 +535,52 @@ function CreateLeaveRequest({ onBack }) {
                       to: newValue,
                     },
                   }));
-                } }
-                slotProps={ {
+                }}
+                slotProps={{
                   textField: {
                     size: "small",
                   },
-                } }
+                }}
               />
             </Grid>
             <Grid
-              size={ { xs: 12, md: 4 } }
+              size={{ xs: 12, md: 4 }}
               container
               direction="column"
-              spacing={ 0 }
-              justifyContent={ "center" }
+              spacing={0}
+              justifyContent={"center"}
             >
               <Typography
-                fontSize={ 16 }
-                pl={ 0.5 }
-                mt={ { md: "21px" } }
+                fontSize={16}
+                pl={0.5}
+                mt={{ md: "21px" }}
                 color="primary"
               >
-                Duration:{ " " }
-                <Typography component={ "span" }>
-                  { durationInDays ? (
+                Duration:{" "}
+                <Typography component={"span"}>
+                  {durationInDays ? (
                     <b>
-                      { durationInDays } day{ durationInDays > 1 ? "s" : "" }
+                      {durationInDays} day{durationInDays > 1 ? "s" : ""}
                     </b>
                   ) : (
                     <em>select from and until date</em>
-                  ) }
+                  )}
                 </Typography>
               </Typography>
             </Grid>
-            <Grid size={ 12 } container direction="column" spacing={ 0 }>
+            <Grid size={12} container direction="column" spacing={0}>
               <Typography
-                fontSize={ 14 }
-                fontWeight={ 600 }
-                pl={ 0.5 }
+                fontSize={14}
+                fontWeight={600}
+                pl={0.5}
                 color="#063686"
               >
-                Short Description<span style={ { color: "red" } }>*</span>
+                Short Description<span style={{ color: "red" }}>*</span>
               </Typography>
               <TextField
                 size="small"
-                value={ inputs.description }
-                onChange={ (e) =>
+                value={inputs.description}
+                onChange={(e) =>
                   setInputs((prev) => ({
                     ...prev,
                     description: e.target.value,
@@ -585,21 +589,21 @@ function CreateLeaveRequest({ onBack }) {
                 placeholder="Give a short description"
               />
             </Grid>
-            <Grid size={ 12 } container direction="column" spacing={ 0 }>
+            <Grid size={12} container direction="column" spacing={0}>
               <Typography
-                fontSize={ 14 }
-                fontWeight={ 600 }
-                pl={ 0.5 }
+                fontSize={14}
+                fontWeight={600}
+                pl={0.5}
                 color="#063686"
               >
                 Reason
               </Typography>
               <TextField
                 size="small"
-                value={ inputs.reason }
+                value={inputs.reason}
                 multiline
-                rows={ 6 }
-                onChange={ (e) =>
+                rows={6}
+                onChange={(e) =>
                   setInputs((prev) => ({
                     ...prev,
                     reason: e.target.value,
@@ -608,50 +612,50 @@ function CreateLeaveRequest({ onBack }) {
                 placeholder="Explain reason for leave in detail"
               />
             </Grid>
-            <Grid size={ 12 } container justifyContent="space-between">
+            <Grid size={12} container justifyContent="space-between">
               <Grid
-                size={ { xs: 12, md: 6 } }
-                gap={ 2 }
+                size={{ xs: 12, md: 6 }}
+                gap={2}
                 container
-                sx={ {
+                sx={{
                   overflowY: "auto",
-                } }
+                }}
               >
-                { inputs.attachments.length === 0 ? (
-                  <Grid container size={ 12 }>
+                {inputs.attachments.length === 0 ? (
+                  <Grid container size={12}>
                     <Button
                       size="small"
                       variant="contained"
                       component="label"
-                      sx={ { textTransform: "none" } }
-                      startIcon={ <AttachFileIcon /> }
+                      sx={{ textTransform: "none" }}
+                      startIcon={<AttachFileIcon />}
                     >
                       Add Attachment
                       <input
                         type="file"
                         hidden
                         multiple
-                        onChange={ addAttachment }
+                        onChange={addAttachment}
                       />
                     </Button>
                   </Grid>
                 ) : (
                   <Grid
                     container
-                    size={ 12 }
+                    size={12}
                     direction="column"
-                    spacing={ 0 }
-                    sx={ { ml: 0.5 } }
+                    spacing={0}
+                    sx={{ ml: 0.5 }}
                   >
                     <Grid
                       container
-                      size={ 12 }
+                      size={12}
                       justifyContent="space-between"
                       alignItems="center"
                     >
                       <Typography
-                        fontSize={ 14 }
-                        fontWeight={ 600 }
+                        fontSize={14}
+                        fontWeight={600}
                         color="#063686"
                       >
                         Attached Files
@@ -661,62 +665,62 @@ function CreateLeaveRequest({ onBack }) {
                           type="file"
                           hidden
                           multiple
-                          onChange={ addAttachment }
+                          onChange={addAttachment}
                         />
                         <AddIcon />
                       </IconButton>
                     </Grid>
 
                     <List disablePadding>
-                      { inputs.attachments.map((file, i) => (
+                      {inputs.attachments.map((file, i) => (
                         <ListItem
-                          key={ i }
+                          key={i}
                           divider
                           secondaryAction={
                             <IconButton
                               edge="end"
-                              onClick={ () => deleteAttachment(i) }
+                              onClick={() => deleteAttachment(i)}
                               color="error"
                             >
                               <DeleteIcon />
                             </IconButton>
                           }
-                          sx={ {
+                          sx={{
                             border: `1px solid transparent`,
                             "&:hover": {
                               backgroundColor: "rgba(0, 0, 0, 0.1)",
                               border: `1px solid #e0e0e0`,
                               borderRadius: 2,
                             },
-                          } }
+                          }}
                         >
-                          <ListItemText primary={ file.name } />
+                          <ListItemText primary={file.name} />
                         </ListItem>
-                      )) }
+                      ))}
                     </List>
                   </Grid>
-                ) }
+                )}
               </Grid>
               <Grid
-                size={ { xs: 12, md: 6 } }
+                size={{ xs: 12, md: 6 }}
                 container
-                alignSelf={ "flex-end" }
-                justifyContent={ "flex-end" }
-                gap={ 1 }
+                alignSelf={"flex-end"}
+                justifyContent={"flex-end"}
+                gap={1}
               >
                 <Button
                   variant="outlined"
-                  onClick={ onBack }
+                  onClick={onBack}
                   size="small"
-                  sx={ { px: 2, textTransform: "none" } }
+                  sx={{ px: 2, textTransform: "none" }}
                 >
                   Cancel
                 </Button>
                 <Button
                   variant="contained"
                   size="small"
-                  sx={ { px: 2, textTransform: "none" } }
-                  onClick={ handleSubmit }
+                  sx={{ px: 2, textTransform: "none" }}
+                  onClick={handleSubmit}
                 >
                   Submit
                 </Button>
@@ -724,7 +728,7 @@ function CreateLeaveRequest({ onBack }) {
             </Grid>
           </Grid>
         </Grid>
-      </Grid>{ " " }
+      </Grid>{" "}
     </LocalizationProvider>
   );
 }

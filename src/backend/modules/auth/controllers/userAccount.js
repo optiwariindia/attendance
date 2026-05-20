@@ -106,6 +106,17 @@ class UserAccount extends CrudController {
     async deactivateAccount(userId) {
         return await this.deactivate(userId);
     }
+
+    async create(data) {
+        const result = await super.create(data);
+        eventStream.emit("user.create", { 
+            userId: result._id, 
+            employeeID: result.employeeID, 
+            origin: result.origin, 
+            data: result 
+        });
+        return result;
+    }
 }
 
 export default new UserAccount();

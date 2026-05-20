@@ -50,10 +50,10 @@ const theme = createTheme({
 export default function App() {
   const user = useUser();
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={ theme }>
       <BrowserRouter>
-        {user.isLoading ? <>Loading</> : <RouteList user={user} />}
-        <Toast/>
+        { user.isLoading ? <>Loading</> : <RouteList user={ user } /> }
+        <Toast />
       </BrowserRouter>
     </ThemeProvider>
   );
@@ -105,8 +105,16 @@ function RouteList({ user }) {
           path: "/admin/settings",
           element: <Modules.Settings.Page.Home />,
         },
+        {
+          path: "/admin/attendance",
+          element: <Modules.Attendance.Component.List title="Attendance Record" user="all" />,
+        },
       ],
     },
+    {
+      path:"*",
+      element:<Navigate to="/"/>
+    }
     /*
     {
       children: [

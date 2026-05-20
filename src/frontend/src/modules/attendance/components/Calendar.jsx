@@ -39,7 +39,7 @@ const STATUS_LABELS = {
   WEEKLY_OFF: "Weekly Off",
   LEAVE: "Leave",
   OFFICIAL_TRIP: "Official Trip",
-  MISSING_OUT: "Missing OUT",
+  MISSING_OUT: "Missing Out",
   IN_OFFICE: "In Office",
   HALF_DAY: "Half Day",
   COMP_OFF: "Comp Off",
@@ -226,7 +226,7 @@ export default function Calendar() {
         }}
       />
       <Box>
-        <Accordion sx={{ mb: 1 }} defaultExpanded>
+        <Accordion sx={{ mb: 1 }} >
           <AccordionSummary
             sx={{ width: "100%" }}
             expandIcon={<ExpandMoreIcon />}
@@ -258,6 +258,7 @@ export default function Calendar() {
                     backgroundColor: STATUS_COLORS[key] || "#e0e0e0",
                     color: "#fff",
                     fontWeight: 700,
+                    px: 0.6
                   }}
                 />
               ))}
@@ -316,7 +317,7 @@ export default function Calendar() {
           popup
           selectable={false}
           style={{
-            height: 700,
+            height: 650,
             width: "100%",
           }}
           eventPropGetter={eventStyleGetter}
