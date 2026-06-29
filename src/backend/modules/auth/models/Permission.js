@@ -32,6 +32,6 @@ const Permission = new MongooseModel(
         auditEnforce: true,
         timestamps: true
     }
-).model();
+);
 
-export default Permission;
+export default Permission.model();

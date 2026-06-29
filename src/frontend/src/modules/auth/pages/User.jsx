@@ -9,6 +9,7 @@ import {
   MenuItem,
   Avatar,
   Autocomplete,
+  Popper,
 } from "@mui/material";
 import * as Shared from "../../../shared";
 
@@ -21,6 +22,7 @@ export default function Users() {
   const [reload, setReload] = React.useState(0);
   const [data, setData] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [changePasswordUser, setChangePasswordUser] = React.useState(null);
 
   React.useEffect(() => {
     setIsLoading(true);
@@ -39,14 +41,14 @@ export default function Users() {
     {
       id: "actions",
       label: "Actions",
-      width: 100,
+      width: 130,
       render: (info) => (
         <>
           <IconButton
             onClick={ () => setSelectedUser(info) }
             title="Edit User"
             color="primary"
-            sx={ { fontSize: 18 } }
+            sx={ { fontSize: 16 } }
           >
             <i className="fas fa-edit"></i>
           </IconButton>
@@ -65,11 +67,26 @@ export default function Users() {
             } }
             title={ info.isActive ? "Deactivate User" : "Activate User" }
             color={ info.isActive ? "warning" : "success" }
-            sx={ { fontSize: 18 } }
+            sx={ { fontSize: 16 } }
           >
             <i
               className={ `fas fa-user-${info.isActive ? "slash" : "check"}` }
             ></i>
+          </IconButton>
+
+          <IconButton
+            title="Change Password"
+            color="info"
+            sx={ { fontSize: 16 } }
+            style={ { color: "#03a3d9" } }
+            onClick={ (event) => {
+              setChangePasswordUser({
+                anchorEl: event.currentTarget,
+                user: info,
+              });
+            } }
+          >
+            <i className="fas fa-lock" />
           </IconButton>
         </>
       ),
@@ -84,13 +101,25 @@ export default function Users() {
     {
       id: "shift",
       label: "Shift",
-      render: info => <div className="flex-apart"><span className="name">{ info?.shift?.name }</span> <span className="time">{ info?.shift?.startTime } - { info?.shift?.endTime }</span></div>,
+      render: (info) => (
+        <div className="flex-apart">
+          <span className="name">{ info?.shift?.name }</span>{ " " }
+          <span className="time">
+            { info?.shift?.startTime } - { info?.shift?.endTime }
+          </span>
+        </div>
+      ),
     },
     {
       id: "reportingTo",
       label: "Reporting To",
-      width:230,
-      render: info => <>{ info?.reportingTo?.name?.first } { info?.reportingTo?.name?.last } ({ info?.reportingTo?.designation } - { info?.reportingTo?.department }  )</>,
+      width: 230,
+      render: (info) => (
+        <>
+          { info?.reportingTo?.name?.first } { info?.reportingTo?.name?.last } (
+          { info?.reportingTo?.designation } - { info?.reportingTo?.department } )
+        </>
+      ),
     },
     {
       id: "name",
@@ -158,6 +187,15 @@ export default function Users() {
           setReload((prev) => prev + 1);
         } }
       />
+      <ChangePassword
+        open={ Boolean(changePasswordUser?.anchorEl) }
+        anchorEl={ changePasswordUser?.anchorEl }
+        user={ changePasswordUser?.user }
+        onClose={ () => {
+          setChangePasswordUser(null);
+          setReload((prev) => prev + 1);
+        } }
+      />
     </Box>
   );
 }
@@ -170,20 +208,39 @@ function AddUser({ open, user, onClose }) {
   const [users, setUsers] = React.useState([]);
   const [departments, setDepartments] = React.useState([]);
   const [designations, setDesignations] = React.useState([]);
+  const [workStatus, setWorkStatus] = React.useState([]);
 
   React.useEffect(() => {
     if (open) {
-      loadData(api.get("/api/v1/organization/department"), (resp) =>
-        setDepartments(resp.data),
+      loadData(
+        api.get("/api/v1/organization/department"),
+        (resp) =>
+          setDepartments(resp.data),
       );
-      loadData(api.get("/api/v1/auth/role"), (resp) => setRoles(resp.data));
-      loadData(api.get("/api/v1/organization/branch"), (resp) =>
-        setBranches(resp.data),
+      loadData(
+        api.get("/api/v1/auth/role"),
+        (resp) => setRoles(resp.data)
       );
-      loadData(api.get("/api/v1/attendance/shift"), (resp) =>
-        setShifts(resp.data),
+      loadData(
+        api.get("/api/v1/organization/branch"),
+        (resp) =>
+          setBranches(resp.data),
       );
-      loadData(api.get("/api/v1/auth/users"), (resp) => setUsers(resp.data));
+      loadData(
+        api.get("/api/v1/attendance/shift"),
+        (resp) =>
+          setShifts(resp.data),
+      );
+      loadData(
+        api.get("/api/v1/auth/users"),
+        (resp) => setUsers(resp.data)
+      );
+      loadData(
+        api.get(`/api/v1/auth/work-status`),
+        resp => {
+          setWorkStatus(resp.data.map(d => ({ label: d.name, value: d.name })))
+        }
+      )
     }
   }, [open]);
 
@@ -235,7 +292,6 @@ function AddUser({ open, user, onClose }) {
         .map((e) => e.trim())
         .filter(Boolean)
       : [];
-  console.log(form);
   return (
     <SideDrawer
       open={ open }
@@ -517,18 +573,20 @@ function AddUser({ open, user, onClose }) {
               },
             } }
           >
-            { [
-              "Draft",
-              "Probation",
-              "Permanent",
-              "Terminated",
-              "Abscond",
-              "Resigned",
-            ].map((s) => (
-              <MenuItem key={ s } value={ s }>
-                { s }
-              </MenuItem>
-            )) }
+            {
+              /* [
+                "Draft",
+                "Probation",
+                "Permanent",
+                "Terminated",
+                "Abscond",
+                "Resigned",
+              ] */
+              workStatus.map((s) => (
+                <MenuItem key={ s.value } value={ s.value }>
+                  { s.label }
+                </MenuItem>
+              )) }
           </TextField>
         </Grid>
         <Grid size={ 6 }>
@@ -678,7 +736,9 @@ function AddUser({ open, user, onClose }) {
               { label: "Friday", value: 5 },
               { label: "Saturday", value: 6 },
             ].filter((d) => form.weeklyOff?.includes(d.value)) }
-            isOptionEqualToValue={ (option, value) => option.value === value.value }
+            isOptionEqualToValue={ (option, value) =>
+              option.value === value.value
+            }
             getOptionLabel={ (option) => option.label }
             onChange={ (e, d) => {
               setForm({
@@ -874,5 +934,101 @@ function AddUser({ open, user, onClose }) {
         </Grid>
       </Grid>
     </SideDrawer>
+  );
+}
+
+function ChangePassword({ open, anchorEl, user, onClose }) {
+  const [form, setForm] = React.useState({
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (form.newPassword !== form.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    await api.patch(`/api/v1/auth/users/${user._id}/reset-password`, {
+      password: form.newPassword,
+    });
+
+    onClose();
+  };
+
+  return (
+    <Popper
+      open={ open }
+      anchorEl={ anchorEl }
+      placement="bottom-start"
+      sx={ { zIndex: 99999 } }
+    >
+      <Box
+        component="form"
+        onSubmit={ handleSubmit }
+        sx={ {
+          p: 2,
+          width: 320,
+          bgcolor: "background.paper",
+          borderRadius: 2,
+          boxShadow: 6,
+          border: "1px solid #e0e0e0",
+          mt: 1,
+        } }
+      >
+        <Typography variant="subtitle2" mb={ 2 } fontWeight="bold" color="primary">
+          Change Password
+        </Typography>
+
+        <TextField
+          fullWidth
+          size="small"
+          type="password"
+          label="New Password"
+          name="newPassword"
+          value={ form.newPassword }
+          onChange={ handleChange }
+          sx={ { mb: 2 } }
+        />
+
+        <TextField
+          fullWidth
+          size="small"
+          type="password"
+          label="Confirm Password"
+          name="confirmPassword"
+          value={ form.confirmPassword }
+          onChange={ handleChange }
+          sx={ { mb: 2 } }
+        />
+
+        <Box
+          sx={ {
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 1,
+          } }
+        >
+          <Button size="small" onClick={ onClose }>
+            Cancel
+          </Button>
+
+          <Button type="submit" variant="contained" size="small" disabled={ !form.newPassword || !form.confirmPassword }>
+            Update
+          </Button>
+        </Box>
+      </Box>
+    </Popper>
   );
 }

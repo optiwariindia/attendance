@@ -1,14 +1,18 @@
 import mongoose from "mongoose";
 import { MongooseModel } from "express-web-tools";
 
-const Role = new MongooseModel(
-    "Role",
+const WorkStatus = new MongooseModel(
+    "WorkStatus",
     new mongoose.Schema({
         name: {
             type: String,
             trim: true,
             lowercase: true,
             required: true
+        },
+        canMarkAttendance: {
+            type: Boolean,
+            default: false
         },
         description: {
             type: String,
@@ -33,6 +37,5 @@ const Role = new MongooseModel(
         auditEnforce: true,
         timestamps: true
     }
-);
-
-export default Role.model();
+)
+export default WorkStatus.model();

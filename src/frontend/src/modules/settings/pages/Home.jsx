@@ -2,6 +2,7 @@ import React from "react";
 
 import { Grid, Fade, Box, Tabs, Tab } from "@mui/material";
 import { Branch, Department, Designation, Shift, Holiday, LeaveCategory } from "./";
+import WorkStatus from "./WorkStatus";
 
 function TabPanel({ children, value, index }) {
     return (
@@ -37,7 +38,12 @@ export default function Settings() {
             label: "Leave Categories",
             render: <LeaveCategory />,
         },
+        {
+            label:"Work Status",
+            render:<WorkStatus/>
+        }
     ];
+    // todo: add workstatus
     return <TabbedPanel tabs={ tabs } defaultOpen={ 0 } />;
 }
 

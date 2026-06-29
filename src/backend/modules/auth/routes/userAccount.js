@@ -48,7 +48,7 @@ router.patch("/users/:userId", adminPermission("manage"), asyncHandler(async (re
     res.json({ status: "success", data: result });
 }));
 
-router.post("/users/:userId/reset-password", adminPermission("manage"), asyncHandler(async (req, res) => {
+router.patch("/users/:userId/reset-password", adminPermission("manage"), asyncHandler(async (req, res) => {
     const { newPassword } = req.body;
     const result = await userAccountController.resetPassword(req.user, req.params.userId, newPassword);
     res.json({ status: "success", ...result });

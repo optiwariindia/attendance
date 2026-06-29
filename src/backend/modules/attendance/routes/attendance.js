@@ -5,9 +5,11 @@ import controller from "../controllers/attendance.js";
 import shiftModel from "../models/Shift.js";
 
 function getToday(shift, action = "in") {
+    // return new Date();
     let today = new Date();
     const yesterday = (new Date(today.setDate(today.getDate() - 1))).toISOString().split("T")[0];
     today = (new Date()).toISOString().split("T")[0]
+    return today;
     const time = {
         start: shift.startTime.split(":").map(v => Number(v)),
         end: shift.endTime.split(":").map(v => Number(v))
@@ -65,6 +67,7 @@ router
         let shift = await shiftModel.findById(req.user.shift);
         const today = getToday(shift);
         let data = await controller.findOne({ user: req?.user?._id, date: today }, "shift")
+        console.log({user:req.user._id,today})
         if (!data) throw new HttpError(403, "Unauthorized");
         return res.json({
             message: ``,

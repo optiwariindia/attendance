@@ -1,4 +1,4 @@
-import { CrudController, HttpError } from "express-web-tools";
+import { CrudController, HttpError, Mutate } from "express-web-tools";
 import mongoose from "mongoose";
 import { Attendance, Shift } from "../models/index.js";
 import User from "../../auth/models/User.js";
@@ -246,6 +246,7 @@ class AttendanceController extends CrudController {
         if (!["in", "out"].includes(action)) {
             throw new HttpError(400, "Invalid action type");
         }
+
         let attendance = await super.findOne({
             user: this.request.user._id,
             date: today,
@@ -254,6 +255,8 @@ class AttendanceController extends CrudController {
             isDeleted: false
         })
         if (!attendance) throw new HttpError(403, "Permission denied");
+        eventStream.emit(`marked-${action}`, { ...this.request.user, attendance });
+        // return;
         switch (action) {
             case "in":
                 if (!attendance.in.time) {
@@ -283,7 +286,7 @@ class AttendanceController extends CrudController {
                 break;
         }
         await attendance.save();
-        eventStream.emit(`marked-${action}`, { ...this.request.user, attendance });
+        eventStream.emit(`marked-${action}`, { user:this.request.user, attendance });
     }
     // todo: generate attendance entry for all employees with start of the day.
 

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <p>
+            Dear HR Team,
+        </p>
+        <p>
+            The following employee has clocked out:
+        </p>
+        <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+
+            <tr>
+                <th align="left" style="padding: 4px 8px;">
+                    Employee ID
+                </th>
+                <td style="padding: 4px 8px;">
+                    {{ user.employeeID }}
+                </td>
+            </tr>
+            <tr>
+                <th align="left" style="padding: 4px 8px;">
+                    Employee
+                </th>
+                <td style="padding: 4px 8px;">
+                    {{ user.name.first }}
+                    {{ user.name.last }}
+                </td>
+            </tr>
+            <tr>
+                <th align="left" style="padding: 4px 8px;">
+                    Department
+                </th>
+                <td style="padding: 4px 8px;">
+                    {{ user.department }}
+                </td>
+            </tr>
+            <tr>
+                <th align="left" style="padding: 4px 8px;">
+                    Clock-out Time
+                </th>
+                <td style="padding: 4px 8px;">
+                    {{ attendance.out.time }}
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>

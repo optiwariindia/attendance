@@ -952,40 +952,7 @@ export default function Datatable({
                                         zIndex: 10,
                                     } }
                                 >
-                                    <CircularProgress disableShrink size={ 120 } thickness={ 0.8 } />
-                                    <Box
-                                        sx={ {
-                                            top: 0,
-                                            left: 0,
-                                            bottom: 0,
-                                            right: 0,
-                                            position: "absolute",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            flexDirection: "column",
-                                        } }
-                                    >
-                                        <Box
-                                            component="img"
-                                            src="/images/logos/sampledge-logo-color.webp"
-                                            alt="loading logo"
-                                            sx={ {
-                                                height: "45px",
-                                                width: "45px",
-                                                opacity: 0.9,
-                                            } }
-                                        />
-                                        <Typography
-                                            sx={ {
-                                                fontSize: "12px",
-                                                fontWeight: "bold",
-                                                color: "secondary.main",
-                                            } }
-                                        >
-                                            SAMPLEDGE
-                                        </Typography>
-                                    </Box>
+                                    <CircularProgress enableTrackSlot disableShrink size={ 80 } thickness={ 1 } />
                                 </Box>
                             </>
                         ) }

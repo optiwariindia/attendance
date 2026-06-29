@@ -48,14 +48,6 @@ const userSchema = new mongoose.Schema({
     ],
     workStatus: {
         type: String,
-        enum: [
-            "Draft",
-            "Probation",
-            "Permanent",
-            "Terminated",
-            "Abscond",
-            "Resigned"
-        ]
     },
     department: {
         type: String
@@ -206,6 +198,6 @@ const userModel = new MongooseModel(
         auditEnforce: true,
         timestamps: true
     }
-).model();
+);
 
-export default userModel;
+export default userModel.model();

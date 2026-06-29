@@ -121,7 +121,7 @@ export default function Branches() {
                 pageSize={ 20 }
                 columns={ columns }
                 data={ data }
-                rowSelectable={ true }
+                // rowSelectable={ true }
             />
 
             <AddBranch

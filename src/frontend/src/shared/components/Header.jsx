@@ -51,10 +51,10 @@ export default function Header() {
                     } }
                 >
                     <img
-                        src={ "/favicon.png" }
+                        src={ "/icon.png" }
                         alt="Logo"
-                        height="30px"
-                        width="30px"
+                        height="44px"
+                        width="44px"
                         style={ {
                             objectFit: "contain",
                             filter: "drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5))",

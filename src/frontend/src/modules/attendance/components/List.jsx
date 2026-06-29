@@ -32,22 +32,28 @@ function List({
             id: "date",
             label: "Date",
             data: "date",
+            feature:["filterable","sortable"],
+            width: 150
         },
         {
             id: "user",
             label: "Employee ID",
-            render: info => info.user.employeeID
+            render: info => info.user.employeeID,
+            feature:["searchable","sortable"],
+            width: 150
         },
         {
             id: "username",
             label: "Name",
-            render: info => <>{ info?.user?.name?.first } { info?.user?.name?.last }</>
+            feature:["searchable","sortable"],
+            render: info => <>{ info?.user?.name?.first.Capitalize() } { info?.user?.name?.last.Capitalize() }</>
         },
         {
             id: "inTime",
             label: "In Time",
             // data: "inTime",
             align:"right",
+            width: 150,
             render: info => {
                 if (!(info?.in?.time)) return <></>;
                 let inTime = new Date(info.in.time);
@@ -61,6 +67,7 @@ function List({
             id: "outTime",
             label: "Out Time",
             align:"right",
+            width: 150,
             render: info => {
                 if (!(info?.out?.time)) return <></>;
                 let outTime = new Date(info.out.time);
@@ -80,6 +87,7 @@ function List({
             label: "Working Hours",
             // data: "workingHours"
             align:"right",
+            width: 150,
             render: (info) => {
                 if (!(info?.in?.time)) return <></>;
                 let inTime = new Date(info.in.time);
