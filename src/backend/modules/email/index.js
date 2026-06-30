@@ -21,6 +21,7 @@ eventStream.addListener("marked-in", async (e) => {
                 user: e._doc ?? e, attendance: e.attendance
             }
         )
+        // todo: dynamically load sender email and rcpt
         await mail.send(
             "support@frequentresearch.com", "hr@frequentresearch.com", `[${e?._doc?.employeeID}] ${e?._doc?.name?.first} ${e?._doc?.name?.last} : Clock-In`, { html: resp }
         )
@@ -30,6 +31,7 @@ eventStream.addListener("marked-in", async (e) => {
 })
 eventStream.addListener("marked-out", async (e) => {
     try {
+        // todo: dynamically load sender email and rcpt
         if (!("name" in (e._doc ?? e))) return;
         let resp = await loadEmailTemplate(
             "/app/modules/email/templates/toHR/clock/out.twig",
