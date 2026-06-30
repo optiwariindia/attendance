@@ -7,9 +7,15 @@ import attendanceModel from "../models/Attendance.js";
 const { DB } = process.env;
 setInterval(() => {
     let today = new Date();
-    const date = today.toISOString().split("T")[0];
-    createAttendanceLog(date)
-}, 1 * 1000);
+    let newDay = new Date();
+    newDay.setHours(6)
+    newDay.setMinutes(30)
+    newDay.setSeconds(0);
+    console.log((newDay - today) <= 0)
+    const [date, time] = today.toISOString().split("T");
+    if ((newDay - today) <= 0)
+        createAttendanceLog(date)
+}, 60 * 1000);
 
 async function createAttendanceLog(date) {
     const [isActive, isDeleted] = [true, false];
@@ -62,6 +68,7 @@ async function createAttendanceLog(date) {
             isActive,
             isDeleted
         })
+        // console.log(attendanceLog);
         await attendanceLog.save()
     }
 }

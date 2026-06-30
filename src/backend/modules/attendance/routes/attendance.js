@@ -26,7 +26,7 @@ router
     .get(AuthGuard, asyncHandler(
         async (req, res) => {
             controller.request = req;
-            const data = await controller.list({},"user")
+            const data = await controller.list({}, "user")
             return res.json({
                 status: "success",
                 data
@@ -36,7 +36,17 @@ router
     .post(AuthGuard, asyncHandler(
         async (req, res) => {
             controller.request = req;
-            const data = await controller.list(req.body)
+            let { dateRange } = req.body;
+            let filter = {}
+            if (dateRange && dateRange instanceof Array && dateRange.length === 2) {
+                let min = dateRange[0].split("T")[0];
+                let max = dateRange[1].split("T")[0];
+                filter["date"] = {
+                    $lte: max,
+                    $gte: min
+                }
+            }
+            const data = await controller.list(filter, "user")
             return res.json({
                 status: "success",
                 data
@@ -55,7 +65,20 @@ router
     }))
     .post(AuthGuard, asyncHandler(async (req, res) => {
         controller.request = req;
-        let data = await controller.list({ ...req.body, user: req?.user?._id })
+        let { dateRange } = req.body;
+        let filter = {
+            user: req?.user?._id
+        }
+        if (dateRange && dateRange instanceof Array && dateRange.length === 2) {
+            let min = dateRange[0].split("T")[0];
+            let max = dateRange[1].split("T")[0];
+            filter["date"] = {
+                $lte: max,
+                $gte: min
+            }
+        }
+        let data = await controller.list(filter)
+        // console.log(data)
         return res.json({
             message: `Total ${data.length} records found`,
             data
@@ -64,10 +87,10 @@ router
 router
     .get('/my/today', AuthGuard, asyncHandler(async (req, res) => {
         controller.request = req;
-        let shift = await shiftModel.findById(req.user.shift);
-        const today = getToday(shift);
-        let data = await controller.findOne({ user: req?.user?._id, date: today }, "shift")
-        console.log({user:req.user._id,today})
+
+        // let shift = await shiftModel.findById(req.user.shift);
+        // const today = getToday(shift);
+        let data = await controller.getAttendance(req.user._id);
         if (!data) throw new HttpError(403, "Unauthorized");
         return res.json({
             message: ``,
@@ -102,37 +125,4 @@ router
         }
     }));
 
-/*
-/my:
-    should return attendance of current user
-/my/today:
-    should return current day attendance of current user
-/today:
-    should return current day attendance
-// User routes
-router.post("/clock", AuthGuard, async (req, res, next) => {
-    try {
-        const { action, gps, origin } = req.body;
-        controller.request=req;
-        const result = await controller.clock(req.user, action, gps, origin || req.headers.host);
-        res.json(result);
-    } catch (err) {
-        next(err);
-    }
-});
-
-router.get("/", AuthGuard, async (req, res, next) => {
-    try {
-        controller.request=req;
-        let date=(new Date()).toISOString().split("T")[0]
-        const data = await controller.list({user:req.user._id,date});
-        res.json({
-            message:"success",
-            data
-        });
-    } catch (err) {
-        next(err);
-    }
-});
-//*/
 export default router;

@@ -5,7 +5,7 @@ import pureIP from "express-pureip";
 import cookieParser from "cookie-parser";
 import fs from "fs";
 import { ExpressServer } from "express-web-tools";
-
+import "../modules/attendance/events/generateDailyEntries.js";
 import moduleRouter from "../modules/index.js";
 
 const currentDir = process.env.PWD

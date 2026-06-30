@@ -15,7 +15,7 @@ function List({
     const me = useUser();
     React.useEffect(() => {
         loadData(
-            api.get(user === "all" ? "/api/v1/attendance" : "/api/v1/attendance/my"),
+            api.post(user === "all" ? "/api/v1/attendance" : "/api/v1/attendance/my", { dateRange }),
             resp => {
                 if ("data" in resp)
                     setData(resp.data);
@@ -25,34 +25,33 @@ function List({
             }
         )
         // 
-    }, [title,user]);
-
+    }, [dateRange, user]);
     const columns = [
         {
             id: "date",
             label: "Date",
             data: "date",
-            feature:["filterable","sortable"],
+            feature: ["filterable", "sortable"],
             width: 150
         },
         {
             id: "user",
             label: "Employee ID",
             render: info => info.user.employeeID,
-            feature:["searchable","sortable"],
+            feature: ["searchable", "sortable"],
             width: 150
         },
         {
             id: "username",
             label: "Name",
-            feature:["searchable","sortable"],
+            feature: ["searchable", "sortable"],
             render: info => <>{ info?.user?.name?.first.Capitalize() } { info?.user?.name?.last.Capitalize() }</>
         },
         {
             id: "inTime",
             label: "In Time",
             // data: "inTime",
-            align:"right",
+            align: "right",
             width: 150,
             render: info => {
                 if (!(info?.in?.time)) return <></>;
@@ -66,7 +65,7 @@ function List({
         {
             id: "outTime",
             label: "Out Time",
-            align:"right",
+            align: "right",
             width: 150,
             render: info => {
                 if (!(info?.out?.time)) return <></>;
@@ -86,7 +85,7 @@ function List({
             id: "workingHours",
             label: "Working Hours",
             // data: "workingHours"
-            align:"right",
+            align: "right",
             width: 150,
             render: (info) => {
                 if (!(info?.in?.time)) return <></>;
@@ -97,9 +96,9 @@ function List({
                 return (outTime - inTime).toTime()
             },
         },
-    ].filter(c=>{
-        if(!user){
-            return ["user","username"].includes(c.id)?false:true;
+    ].filter(c => {
+        if (!user) {
+            return ["user", "username"].includes(c.id) ? false : true;
         }
         return true
     });
@@ -116,7 +115,7 @@ function List({
                         />
                     </Box>
                 }
-                title={title??"My Attendance Records"}
+                title={ title ?? "My Attendance Records" }
                 isLoading={ isLoading }
                 pagination={ [10, 20, 50, 100] }
                 pageSize={ 20 }

@@ -15,7 +15,7 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import dayjs from "dayjs";
 
 const ranges = {
-    today: [dayjs().startOf("day"), dayjs().endOf("day")],
+    today: [dayjs().startOf("day"), dayjs()],
     yesterday: [
         dayjs().subtract(1, "day").startOf("day"),
         dayjs().subtract(1, "day").endOf("day"),

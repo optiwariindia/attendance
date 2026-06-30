@@ -6,6 +6,8 @@ import {
   Button,
   Grid,
   IconButton,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import * as Shared from "../../../shared";
 import AddLocationIcon from "@mui/icons-material/AddLocation";
@@ -216,22 +218,6 @@ function AddWorkStatus({ open, WorkStatus, onClose }) {
             required
           />
         </Grid>
-        <Grid
-          size={12}
-          sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}
-        >
-          <Button
-            type="button"
-            variant="contained"
-            color={form.canMarkAttendance ? "primary" : "danger"}
-            size="small"
-            onClick={(e) => {
-              setForm({ ...form, canMarkAttendance: !form.canMarkAttendance });
-            }}
-          >
-            {form.canMarkAttendance ? "Mark Attendance" : "Not mark attendance"}
-          </Button>
-        </Grid>
         <Grid size={12}>
           <TextField
             label="Description"
@@ -244,6 +230,23 @@ function AddWorkStatus({ open, WorkStatus, onClose }) {
             rows={3}
           />
         </Grid>
+
+        <FormControlLabel
+          labelPlacement="end"
+          control={
+            <Checkbox
+              checked={form.canMarkAttendance}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  canMarkAttendance: e.target.checked,
+                })
+              }
+            />
+          }
+          label="Allow to Mark Attendance"
+        />
+
         <Grid
           size={12}
           sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}

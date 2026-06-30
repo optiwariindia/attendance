@@ -176,7 +176,7 @@ export default function Users() {
         columns={ columns }
         data={ data }
         isLoading={ isLoading }
-        rowSelectable={ true }
+        // rowSelectable={ true }
         pageSize={ 25 }
       />
       <AddUser

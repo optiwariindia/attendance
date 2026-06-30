@@ -3,7 +3,6 @@ import eventStream from "/app/core/events.js";
 import twig from "twig";
 
 function loadEmailTemplate(path, data) {
-    console.log(data.user)
     return new Promise(
         (resolve, reject) => {
             twig.renderFile(path, data, (error, response) => {
