@@ -22,7 +22,7 @@ eventStream.addListener("marked-in", async (e) => {
             }
         )
         await mail.send(
-            "support@frequentresearch.com", "om.tiwari@frequentresearch.com", `[${e?._doc?.employeeID}] ${e?._doc?.name?.first} ${e?._doc?.name?.last} : Clock-In`, { html: resp }
+            "support@frequentresearch.com", "hr@frequentresearch.com", `[${e?._doc?.employeeID}] ${e?._doc?.name?.first} ${e?._doc?.name?.last} : Clock-In`, { html: resp }
         )
     } catch (error) {
         console.log(error)

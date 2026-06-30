@@ -22,11 +22,11 @@ class AttendanceController extends CrudController {
         const user = await User.findById(userId).populate("shift branch");
         if (!user) throw new HttpError(404, "User not found");
 
-        const startDate = new Date(year, month - 1, 1);
-        const endDate = new Date(year, month, 0);
+        const startDate = new Date(Date.UTC(year, month - 1, 1));
+        const endDate = new Date(Date.UTC(year, month, 0));
         const startStr = startDate.toISOString().split("T")[0];
         const endStr = endDate.toISOString().split("T")[0];
-
+        console.log([startStr, endStr])
         const [attendanceRecords, holidays] = await Promise.all([
             this.model.find({
                 user: userId,
@@ -251,9 +251,9 @@ class AttendanceController extends CrudController {
             .limit(1);
         if (!(temp instanceof Array) || temp.length !== 1)
             throw new HttpError(401, "Invalid request")
-        let date=new Date(temp[0].date);
-        let now=new Date();
-        if((now - date) < ( 27 * 3600 * 1000))return temp[0];
+        let date = new Date(temp[0].date);
+        let now = new Date();
+        if ((now - date) < (27 * 3600 * 1000)) return temp[0];
         throw new HttpError(403, "Permission denied");
     }
     async clock(today, action, gps) {
