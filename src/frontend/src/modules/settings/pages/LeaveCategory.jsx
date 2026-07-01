@@ -9,6 +9,7 @@ import {
     FormControlLabel,
     Checkbox,
     Switch,
+    Autocomplete
 } from "@mui/material";
 import * as Shared from "../../../shared";
 
@@ -112,7 +113,19 @@ export default function LeaveCategories() {
 
 function AddLeaveCategory({ open, category, onClose }) {
     const [form, setForm] = React.useState({});
-
+    const leaveDeadline = [
+        { label: "5 days before", value: -5 },
+        { label: "4 days before", value: -4 },
+        { label: "3 days before", value: -3 },
+        { label: "2 days before", value: -2 },
+        { label: "1 day before", value: -1 },
+        { label: "before leave", value: 0 },
+        { label: "1 day after", value: 1 },
+        { label: "2 days after", value: 2 },
+        { label: "3 days after", value: 3 },
+        { label: "4 days after", value: 4 },
+        { label: "5 days after", value: 5 }
+    ]
     React.useEffect(() => {
         setForm({
             name: category?.name ?? "",
@@ -122,6 +135,7 @@ function AddLeaveCategory({ open, category, onClose }) {
             isActive: category?.isActive ?? true,
             sortOrder: category?.sortOrder ?? 0,
             isPaid: category?.isPaid ?? true,
+            requestDeadline: category?.requestDeadline ?? 0,
             requiresApproval: category?.requiresApproval ?? true,
             allowHalfDay: category?.allowHalfDay ?? true,
             allowNegativeBalance: category?.allowNegativeBalance ?? false,
@@ -170,7 +184,39 @@ function AddLeaveCategory({ open, category, onClose }) {
                 <Grid size={ 12 }>
                     <TextField label="Description" name="description" value={ form.description || "" } onChange={ handleChange } fullWidth size="small" multiline rows={ 2 } />
                 </Grid>
-                
+                <Grid
+                    size={ { xs: 12, md: 6 } }
+                    container
+                    direction="column"
+                    spacing={ 0 }
+                >
+                    <Autocomplete
+                        size="small"
+                        options={ leaveDeadline }
+                        value={ leaveDeadline.find(v => v.value === form.requestDeadline) ?? null }
+                        onChange={ (event, newValue) => {
+                            setForm({ ...form, requestDeadline: newValue.value })
+                        } }
+                        getOptionLabel={ (option) => option.label }
+                        renderInput={ (params) => (
+                            <TextField { ...params } label={ <>Application Acceptance<span style={ { color: "red" } }>*</span></> } />
+                        ) }
+                        slotProps={ {
+                            popper: {
+                                modifiers: [
+                                    {
+                                        name: "zIndex",
+                                        enabled: true,
+                                        phase: "write",
+                                        fn: ({ state }) => {
+                                            state.styles.popper.zIndex = 15000;
+                                        },
+                                    },
+                                ],
+                            },
+                        } }
+                    />
+                </Grid>
                 <Grid size={ 6 }>
                     <TextField label="Color" name="color" type="color" value={ form.color || "#0c5adb" } onChange={ handleChange } fullWidth size="small" />
                 </Grid>
@@ -186,32 +232,32 @@ function AddLeaveCategory({ open, category, onClose }) {
                 </Grid>
 
                 <Grid size={ 12 }>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mt: 1 }}>Policies</Typography>
+                    <Typography variant="subtitle2" sx={ { fontWeight: 'bold', mt: 1 } }>Policies</Typography>
                 </Grid>
 
                 <Grid size={ 6 }>
-                    <FormControlLabel control={<Switch name="isPaid" checked={!!form.isPaid} onChange={handleChange} />} label="Paid Leave" />
+                    <FormControlLabel control={ <Switch name="isPaid" checked={ !!form.isPaid } onChange={ handleChange } /> } label="Paid Leave" />
                 </Grid>
                 <Grid size={ 6 }>
-                    <FormControlLabel control={<Switch name="requiresApproval" checked={!!form.requiresApproval} onChange={handleChange} />} label="Requires Approval" />
+                    <FormControlLabel control={ <Switch name="requiresApproval" checked={ !!form.requiresApproval } onChange={ handleChange } /> } label="Requires Approval" />
                 </Grid>
                 <Grid size={ 6 }>
-                    <FormControlLabel control={<Switch name="allowHalfDay" checked={!!form.allowHalfDay} onChange={handleChange} />} label="Allow Half Day" />
+                    <FormControlLabel control={ <Switch name="allowHalfDay" checked={ !!form.allowHalfDay } onChange={ handleChange } /> } label="Allow Half Day" />
                 </Grid>
                 <Grid size={ 6 }>
-                    <FormControlLabel control={<Switch name="allowNegativeBalance" checked={!!form.allowNegativeBalance} onChange={handleChange} />} label="Allow Negative Balance" />
+                    <FormControlLabel control={ <Switch name="allowNegativeBalance" checked={ !!form.allowNegativeBalance } onChange={ handleChange } /> } label="Allow Negative Balance" />
                 </Grid>
                 <Grid size={ 6 }>
-                    <FormControlLabel control={<Switch name="allowedInProbation" checked={!!form.allowedInProbation} onChange={handleChange} />} label="Allowed in Probation" />
+                    <FormControlLabel control={ <Switch name="allowedInProbation" checked={ !!form.allowedInProbation } onChange={ handleChange } /> } label="Allowed in Probation" />
                 </Grid>
                 <Grid size={ 6 }>
-                    <FormControlLabel control={<Switch name="attachmentRequired" checked={!!form.attachmentRequired} onChange={handleChange} />} label="Attachment Required" />
+                    <FormControlLabel control={ <Switch name="attachmentRequired" checked={ !!form.attachmentRequired } onChange={ handleChange } /> } label="Attachment Required" />
                 </Grid>
                 <Grid size={ 6 }>
-                    <FormControlLabel control={<Switch name="isCarryForward" checked={!!form.isCarryForward} onChange={handleChange} />} label="Carry Forward" />
+                    <FormControlLabel control={ <Switch name="isCarryForward" checked={ !!form.isCarryForward } onChange={ handleChange } /> } label="Carry Forward" />
                 </Grid>
                 <Grid size={ 6 }>
-                    <FormControlLabel control={<Switch name="isActive" checked={!!form.isActive} onChange={handleChange} />} label="Active Status" />
+                    <FormControlLabel control={ <Switch name="isActive" checked={ !!form.isActive } onChange={ handleChange } /> } label="Active Status" />
                 </Grid>
 
                 <Grid size={ 12 } sx={ { display: 'flex', justifyContent: 'flex-end', mt: 2 } }>

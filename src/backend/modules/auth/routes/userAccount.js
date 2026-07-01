@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { asyncHandler } from "express-web-tools";
+import { asyncHandler,HttpError } from "express-web-tools";
 import userAccountController from "../controllers/userAccount.js";
 import { auth as authGuard, permission as permissionGuard } from "../guards/index.js";
 
@@ -33,7 +33,7 @@ const adminPermission = (action) => permissionGuard("users", "profiles", action)
 
 router.get("/users", adminPermission("view"), asyncHandler(async (req, res) => {
     userAccountController.request = req;
-    const result = await userAccountController.list(req.query);
+    const result = await userAccountController.list(req.query, null, {}, "+isActive");
     res.json({ status: "success", data: result });
 }));
 
@@ -55,6 +55,7 @@ router.patch("/users/:userId/reset-password", adminPermission("manage"), asyncHa
 }));
 
 router.patch("/users/:userId/role", adminPermission("manage"), asyncHandler(async (req, res) => {
+    if (req.user._id.toString() === req.params.userId) throw new HttpError(403, "Cannot change your own role")
     const { role } = req.body;
     const result = await userAccountController.changeRole(req.params.userId, role);
     res.json({ status: "success", data: result });

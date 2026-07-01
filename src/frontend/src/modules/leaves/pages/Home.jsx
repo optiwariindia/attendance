@@ -26,27 +26,26 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import * as Shared from "../../../shared";
 import { useUser } from "../../../shared/context/User";
+import { api, loadData } from "../../../shared/utils";
 const { Datatable, SectionTitle } = Shared.Components;
 
 export default function Leave() {
   const [creatingLeave, setCreatingLeave] = React.useState(false);
-  const [activeLeave, setActiveLeave] = React.useState(false);
-  const [data, setData] = React.useState(null);
-  //  ( [
-  //   {
-  //     requestDate: "2026-01-01",
-  //     type: "sick",
-  //     from: "2026-01-10",
-  //     to: "2026-01-12",
-  //     duration: 3,
-  //     status: "approved",
-  //   },
-  // ]);
+  const [activeLeave, setActiveLeave] = React.useState(true);
+  const [data, setData] = React.useState([]);
 
   const [confirm, setConfirm] = React.useState({
     anchorEl: null,
     index: null,
   });
+  React.useEffect(() => {
+    loadData(
+      api.get(`/api/v1/leaves/application`),
+      resp => {
+        setData(resp.data)
+      }
+    )
+  }, [])
   const openConfirm = Boolean(confirm.anchorEl);
   const closeConfirm = () => setConfirm({ anchorEl: null, index: null });
 
@@ -64,7 +63,7 @@ export default function Leave() {
       id: "requestDate",
       label: "Request Date",
       width: 140,
-      render: (info) => new Date(info.requestDate).showDate(),
+      render: (info) => new Date(info.createdAt).showDate(),
     },
     {
       id: "type",
@@ -153,7 +152,7 @@ export default function Leave() {
         />
       ) : (
         <>
-          { activeLeave ? (
+          { data.length ? (
             <>
               { " " }
               <Box mt={ -1 } px={ { xs: 0, sm: 2 } }>
@@ -275,7 +274,12 @@ export default function Leave() {
 }
 
 function CreateLeaveRequest({ onBack, setActiveLeave }) {
+  const [requestDeadline, setRequestDeadline] = React.useState(0);
   const user = useUser();
+  const date = {
+    min: dayjs().add(requestDeadline, "day"),
+    max: dayjs().add(requestDeadline + 30, "day")
+  }
   const [inputs, setInputs] = React.useState({
     to: [],
     type: "",
@@ -287,16 +291,20 @@ function CreateLeaveRequest({ onBack, setActiveLeave }) {
     },
     attachments: [],
   });
-  return <pre>{ JSON.stringify(user,null,2) }</pre>
-  const sendToOptions = [
-    { label: "Manager", value: "manager" },
-    { label: "HR", value: "hr" },
-  ];
-  const leaveOptions = [
-    { label: "Casual Leave", value: "casual" },
-    { label: "Sick Leave", value: "sick" },
-  ];
+  const [leaveOptions, setLeaveOptions] = React.useState([]);
 
+  React.useEffect(() => {
+    loadData(
+      api.get(`/api/v1/leaves/leave-category`),
+      resp => {
+        setLeaveOptions(resp.data.map(l => ({
+          label: l.name,
+          value: l.shortCode,
+          requestDeadline: l.requestDeadline
+        })));
+      }
+    )
+  }, [])
   const durationInDays =
     inputs.period.from && inputs.period.to
       ? inputs.period.to.diff(inputs.period.from, "day") + 1
@@ -340,13 +348,8 @@ function CreateLeaveRequest({ onBack, setActiveLeave }) {
     if (inputs.period.to) {
       formData.append("to", inputs.period.to.toISOString());
     }
-
-    inputs.attachments.forEach((file) => {
-      formData.append("attachments", file);
-    });
-
-    console.log([...formData.entries()]);
-    setActiveLeave(true);
+    const resp = await api.put(`/api/v1/leaves/application`, inputs);
+    // onBack();
   };
 
   return (
@@ -407,41 +410,9 @@ function CreateLeaveRequest({ onBack, setActiveLeave }) {
           </SectionTitle>
 
           <Grid container size={ 12 } spacing={ { xs: 1, md: 2 } } p={ 2 }>
+
             <Grid
-              size={ { xs: 12, md: 6 } }
-              container
-              direction="column"
-              spacing={ 0 }
-            >
-              <Typography
-                fontSize={ 14 }
-                fontWeight={ 600 }
-                pl={ 0.5 }
-                color="#063686"
-              >
-                Send Application To<span style={ { color: "red" } }>*</span>
-              </Typography>
-              <Autocomplete
-                size="small"
-                multiple
-                options={ sendToOptions }
-                value={ sendToOptions.filter((opt) =>
-                  inputs.to.includes(opt.value),
-                ) }
-                onChange={ (event, newValue) => {
-                  setInputs((prev) => ({
-                    ...prev,
-                    to: newValue.map((opt) => opt.value),
-                  }));
-                } }
-                getOptionLabel={ (option) => option.label }
-                renderInput={ (params) => (
-                  <TextField { ...params } placeholder="Select recipient" />
-                ) }
-              />
-            </Grid>{ " " }
-            <Grid
-              size={ { xs: 12, md: 6 } }
+              size={ { xs: 12, md: 5 } }
               container
               direction="column"
               spacing={ 0 }
@@ -461,6 +432,7 @@ function CreateLeaveRequest({ onBack, setActiveLeave }) {
                   leaveOptions.find((opt) => opt.value === inputs.type) || null
                 }
                 onChange={ (event, newValue) => {
+                  setRequestDeadline(newValue.requestDeadline);
                   setInputs((prev) => ({
                     ...prev,
                     type: newValue ? newValue.value : "",
@@ -472,105 +444,134 @@ function CreateLeaveRequest({ onBack, setActiveLeave }) {
                 ) }
               />
             </Grid>
-            <Grid
-              size={ { xs: 12, md: 4 } }
-              container
-              direction="column"
-              spacing={ 0 }
-              sx={ { maxWidth: 170 } }
-            >
-              <Typography
-                fontSize={ 14 }
-                fontWeight={ 600 }
-                pl={ 0.5 }
-                color="#063686"
+            <Grid size={ 7 } container >
+              <Grid
+                size={ { xs: 12, md: 4 } }
+                container
+                direction="column"
+                spacing={ 0 }
+                sx={ { maxWidth: 170 } }
               >
-                From<span style={ { color: "red" } }>*</span>
-              </Typography>
-              <DatePicker
-                disablePast
-                value={ inputs.period.from }
-                onChange={ (newValue) => {
-                  setInputs((prev) => ({
-                    ...prev,
-                    period: {
-                      ...prev.period,
-                      from: newValue,
-                      to:
-                        prev.period.to &&
-                          newValue &&
-                          prev.period.to.isBefore(newValue)
-                          ? null
-                          : prev.period.to,
-                    },
-                  }));
-                } }
-                slotProps={ {
-                  textField: {
-                    size: "small",
-                  },
-                } }
-              />
-            </Grid>
-            <Grid
-              size={ { xs: 12, md: 4 } }
-              container
-              direction="column"
-              spacing={ 0 }
-              sx={ { maxWidth: 170 } }
-            >
-              <Typography
-                fontSize={ 14 }
-                fontWeight={ 600 }
-                pl={ 0.5 }
-                color="#063686"
-              >
-                Until<span style={ { color: "red" } }>*</span>
-              </Typography>
-              <DatePicker
-                size="small"
-                value={ inputs.period.to }
-                minDate={ inputs.period.from }
-                onChange={ (newValue) => {
-                  setInputs((prev) => ({
-                    ...prev,
-                    period: {
-                      ...prev.period,
-                      to: newValue,
-                    },
-                  }));
-                } }
-                slotProps={ {
-                  textField: {
-                    size: "small",
-                  },
-                } }
-              />
-            </Grid>
-            <Grid
-              size={ { xs: 12, md: 4 } }
-              container
-              direction="column"
-              spacing={ 0 }
-              justifyContent={ "center" }
-            >
-              <Typography
-                fontSize={ 16 }
-                pl={ 0.5 }
-                mt={ { md: "21px" } }
-                color="primary"
-              >
-                Duration:{ " " }
-                <Typography component={ "span" }>
-                  { durationInDays ? (
-                    <b>
-                      { durationInDays } day{ durationInDays > 1 ? "s" : "" }
-                    </b>
-                  ) : (
-                    <em>select from and until date</em>
-                  ) }
+                <Typography
+                  fontSize={ 14 }
+                  fontWeight={ 600 }
+                  pl={ 0.5 }
+                  color="#063686"
+                >
+                  From<span style={ { color: "red" } }>*</span>
                 </Typography>
-              </Typography>
+                <DatePicker
+                  minDate={ date.min }
+                  maxDate={ date.max }
+                  value={ inputs.period.from }
+                  onChange={ (newValue) => {
+                    setInputs((prev) => ({
+                      ...prev,
+                      period: {
+                        ...prev.period,
+                        from: newValue,
+                        to:
+                          prev.period.to &&
+                            newValue &&
+                            prev.period.to.isBefore(newValue)
+                            ? null
+                            : prev.period.to,
+                      },
+                    }));
+                  } }
+                  slotProps={ {
+                    textField: {
+                      size: "small",
+                    },
+                  } }
+                />
+              </Grid>
+              <Grid
+                size={ { xs: 12, md: 4 } }
+                container
+                direction="column"
+                spacing={ 0 }
+                sx={ { maxWidth: 170 } }
+              >
+                <Typography
+                  fontSize={ 14 }
+                  fontWeight={ 600 }
+                  pl={ 0.5 }
+                  color="#063686"
+                >
+                  Until<span style={ { color: "red" } }>*</span>
+                </Typography>
+                <DatePicker
+                  size="small"
+                  value={ inputs.period.to }
+                  minDate={ inputs.period.from }
+                  maxDate={ dayjs(inputs.period.from).add(30, "day") }
+                  onChange={ (newValue) => {
+                    setInputs((prev) => ({
+                      ...prev,
+                      period: {
+                        ...prev.period,
+                        to: newValue,
+                      },
+                    }));
+                  } }
+                  slotProps={ {
+                    textField: {
+                      size: "small",
+                    },
+                  } }
+                />
+              </Grid>
+              <Grid
+                size={ { xs: 12, md: 4 } }
+                container
+                direction="column"
+                spacing={ 0 }
+                justifyContent={ "center" }
+              ><Typography
+                fontSize={ 14 }
+                fontWeight={ 600 }
+                pl={ 0.5 }
+                color="#063686"
+              >
+                  Duration<span style={ { color: "red" } }>*</span>
+                </Typography>
+                <TextField
+                  type="number"
+                  size="small"
+                  value={ inputs.duration }
+                  onChange={ (e) =>
+                    setInputs((prev) => ({
+                      ...prev,
+                      duration: e.target.value,
+                    }))
+                  }
+                  slotProps={ {
+                    htmlInput: {
+                      min: 0.5,
+                      step: 0.5,
+                      max: durationInDays
+                    },
+                  } }
+                />
+                {/* <Typography
+                  fontSize={ 16 }
+                  pl={ 0.5 }
+                  mt={ { md: "21px" } }
+                  color="primary"
+                >
+                  Duration:{ " " }
+                  <Typography component={ "span" }>
+                    { durationInDays ? (
+                      <b>
+                        { durationInDays } day{ durationInDays > 1 ? "s" : "" }
+                      </b>
+                    ) : (
+                      <em>select from and until date</em>
+                    ) }
+                  </Typography>
+                </Typography> */}
+              </Grid>
             </Grid>
             <Grid size={ 12 } container direction="column" spacing={ 0 }>
               <Typography
@@ -579,7 +580,7 @@ function CreateLeaveRequest({ onBack, setActiveLeave }) {
                 pl={ 0.5 }
                 color="#063686"
               >
-                Short Description<span style={ { color: "red" } }>*</span>
+                Reason of Leave<span style={ { color: "red" } }>*</span>
               </Typography>
               <TextField
                 size="small"
@@ -600,7 +601,7 @@ function CreateLeaveRequest({ onBack, setActiveLeave }) {
                 pl={ 0.5 }
                 color="#063686"
               >
-                Reason
+                Description
               </Typography>
               <TextField
                 size="small"
@@ -617,7 +618,7 @@ function CreateLeaveRequest({ onBack, setActiveLeave }) {
               />
             </Grid>
             <Grid size={ 12 } container justifyContent="space-between">
-              <Grid
+              {/* <Grid
                 size={ { xs: 12, md: 6 } }
                 gap={ 2 }
                 container
@@ -704,9 +705,9 @@ function CreateLeaveRequest({ onBack, setActiveLeave }) {
                     </List>
                   </Grid>
                 ) }
-              </Grid>
+              </Grid> */}
               <Grid
-                size={ { xs: 12, md: 6 } }
+                size={ { xs: 12, md: 12 } }
                 container
                 alignSelf={ "flex-end" }
                 justifyContent={ "flex-end" }

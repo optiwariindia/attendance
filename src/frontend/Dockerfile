@@ -2,11 +2,14 @@ FROM node:24-slim AS base
 
 WORKDIR /frontend
 
-RUN chown node:node /frontend 
 
-USER node
 COPY package.json .
+COPY patch-node-modules.js .
+
 RUN npm install
+
+RUN chown -R node:node /frontend 
+USER node
 
 FROM base AS development
 

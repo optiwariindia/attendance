@@ -41,7 +41,7 @@ export default function Users() {
     {
       id: "actions",
       label: "Actions",
-      width: 130,
+      width: 140,
       render: (info) => (
         <>
           <IconButton
@@ -88,6 +88,32 @@ export default function Users() {
           >
             <i className="fas fa-lock" />
           </IconButton>
+
+          <IconButton
+            onClick={ async () => {
+              if (
+                window.confirm(
+                  `Are you sure you want to change role to ${info.role === "admin" ? "User" : "Admin"}`,
+                )
+              ) {
+                const resp=await api.patch(
+                  `/api/v1/auth/users/${info._id}/role`, {
+                  role: info.role === "admin" ? "user" : "admin"
+                }
+                );
+                if(resp.status==="error"){
+                  alert(resp.message);
+                }else{
+                  setReload((prev) => prev + 1);                  
+                }
+              }
+            } }
+            title={ info.role === "admin" ? "role: Admin" : "role: User" }
+            color={ info.role === "admin" ? "primary" : "error" }
+            sx={ { fontSize: 16 } }
+          >
+            <i className="fas fa-user-shield"></i>
+          </IconButton>
         </>
       ),
     },
@@ -97,29 +123,6 @@ export default function Users() {
       data: "employeeID",
       width: 120,
       feature: ["sortable", "searchable"],
-    },
-    {
-      id: "shift",
-      label: "Shift",
-      render: (info) => (
-        <div className="flex-apart">
-          <span className="name">{ info?.shift?.name }</span>{ " " }
-          <span className="time">
-            { info?.shift?.startTime } - { info?.shift?.endTime }
-          </span>
-        </div>
-      ),
-    },
-    {
-      id: "reportingTo",
-      label: "Reporting To",
-      width: 230,
-      render: (info) => (
-        <>
-          { info?.reportingTo?.name?.first } { info?.reportingTo?.name?.last } (
-          { info?.reportingTo?.designation } - { info?.reportingTo?.department } )
-        </>
-      ),
     },
     {
       id: "name",
@@ -146,6 +149,7 @@ export default function Users() {
       feature: ["sortable", "searchable"],
       width: 275,
     },
+
     {
       id: "department",
       label: "Department",
@@ -157,9 +161,27 @@ export default function Users() {
       data: "designation",
     },
     {
-      id: "role",
-      label: "Role",
-      data: "role",
+      id: "reportingTo",
+      label: "Reporting To",
+      width: 230,
+      render: (info) => (
+        <>
+          { info?.reportingTo?.name?.first } { info?.reportingTo?.name?.last } (
+          { info?.reportingTo?.designation } - { info?.reportingTo?.department } )
+        </>
+      ),
+    },
+    {
+      id: "shift",
+      label: "Shift",
+      render: (info) => (
+        <div className="flex-apart">
+          <span className="name">{ info?.shift?.name }</span>{ " " }
+          <span className="time">
+            { info?.shift?.startTime } - { info?.shift?.endTime }
+          </span>
+        </div>
+      ),
     },
     {
       id: "workStatus",

@@ -40,9 +40,43 @@ eventStream.addListener("marked-out", async (e) => {
             }
         )
         await mail.send(
-            "support@frequentresearch.com", "om.tiwari@frequentresearch.com", `[${e?._doc?.employeeID}] ${e?._doc?.name?.first} ${e?._doc?.name?.last} : Clock-Out`, { html: resp }
+            "support@frequentresearch.com", "hr@frequentresearch.com", `[${e?._doc?.employeeID}] ${e?._doc?.name?.first} ${e?._doc?.name?.last} : Clock-Out`, { html: resp }
         )
     } catch (error) {
         console.log(error)
     }
 })
+eventStream.addListener("leave-applied", async (e) => {
+    try {
+        console.log({e});
+        Promise.all([
+            // notifyHR("leave/applied", `Leave Application - ${e.categorySnapshot.shortCode} [${e.user.employeeID}]: ${e.duration} days, from:${(new Date(e.from)).toDateString()} `, e),
+            notifyMGR("leave/applied", `Leave Application - ${e.categorySnapshot.shortCode} [${e.user.employeeID}]: ${e.duration} days, from:${(new Date(e.from)).toDateString()} `, e)
+        ])
+        // notifyMGMT("leave/applied", `Leave Application - ${e.categorySnapshot.shortCode} [${e.user.employeeID}]: ${e.duration} days, from:${e.from.split("T")[0]} `)
+
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+async function notifyHR(action, subject, e) {
+    let resp = await loadEmailTemplate(
+        `/app/modules/email/templates/toHR/${action}.twig`,
+        e
+    )
+    await mail.send(
+        "support@frequentresearch.com", "hr@frequentresearch.com", subject, { html: resp }
+    )
+}
+
+async function notifyMGR(action, subject, e) {
+    let resp = await loadEmailTemplate(
+        `/app/modules/email/templates/toMGR/${action}.twig`,
+        e
+    )
+    console.log(resp)
+    await mail.send(
+        "support@frequentresearch.com", e?.user?.routing?.leave?.to.join(","), subject, { html: resp }, e?.user?.routing?.leave?.cc.join(","), e?.user?.routing?.leave?.bcc.join(",")
+    )
+}

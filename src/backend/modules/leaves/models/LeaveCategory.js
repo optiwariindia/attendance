@@ -29,6 +29,10 @@ const leaveCategorySchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    requestDeadline:{
+        type:Number,
+        default:0 // application is not accepted after this number of days
+    },
     requiresApproval: {
         type: Boolean,
         default: true

@@ -1,0 +1,156 @@
+{# email_leave_request_notification.html.twig #}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eeeeee; border-radius: 5px; }
+        .header { border-bottom: 2px solid #28a745; padding-bottom: 10px; margin-bottom: 20px; }
+        .notification-text { font-size: 1.1em; color: #111111; margin-bottom: 20px; }
+        .details-table { width: 100%; border-collapse: collapse; margin: 20px 0; background-color: #f9f9f9; }
+        .details-table td { padding: 12px; border: 1px solid #e0e0e0; }
+        .details-table td.label { font-weight: bold; width: 30%; color: #555555; }
+        .reason-box { background-color: #f1f1f1; padding: 15px; border-left: 4px solid #28a745; margin-top: 10px; }
+        .footer { margin-top: 30px; font-size: 0.85em; color: #888888; border-top: 1px solid #eeeeee; padding-top: 10px; }
+        .button{
+                color: #fff;
+    padding: 10px 25px;
+    text-decoration: none;
+    border-radius: 10px;
+        }
+        .button-container{
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+    </style>
+    </head>
+    <body>
+
+        <div class="container">
+            <div class="header">
+                <h3 style="margin: 0; color: #28a745;">
+                    System Notification: Leave Application
+                </h3>
+            </div>
+
+            <!-- Aapka exact requirement yahan implement kiya hai -->
+            <p class="notification-text">
+                <strong>
+                    {{ user.name.first }}
+                </strong>
+                has requested for a leave (
+                {{ categorySnapshot.name }}
+                ) on
+                <strong>
+                    {{ from|date('F d, Y') }}
+                </strong>
+                for
+                <strong>
+                    {{ duration }}
+                    days
+                </strong>
+                due to
+                <strong>
+                    {{ reason |nl2br }}
+                </strong>
+            </p>
+
+            <table class="details-table">
+                <tr>
+                    <td class="label">
+                        Employee ID
+                    </td>
+                    <td>
+                        {{ user.employeeID }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">
+                        Name
+                    </td>
+                    <td>
+                        {{ user.name.first }}
+                        {{ user.name.last }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">
+                        e-mail
+                    </td>
+                    <td>
+                        {{ user.email }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">
+                        Department / Designation
+                    </td>
+                    <td>
+                        {{ user.department }}
+                        (
+                        {{ user.designation }}
+                        )
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">
+                        Start Date
+                    </td>
+                    <td>
+                        {{ from|date('F d, Y') }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">
+                        End Date:
+                    </td>
+                    <td>
+                        {{ to|date('F d, Y') }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">
+                        Duration
+                    </td>
+                    <td>
+                        {{ duration }}
+                        days
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">
+                        Leave Type:
+                    </td>
+                    <td>
+                        {{ categorySnapshot.name }}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div class="button-container">
+                            <a class="button" style="background: red;" href="https://{{ origin }}/api/v1/leaves/reject/{{ _id }}">
+                                Reject
+                            </a>
+                            <a class="button" style="background: green;" href="https://{{ origin }}/api/v1/leaves/approve/{{ _id }}">
+                                Approve
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <p style="margin-top: 25px;">
+                Please log in to the portal to approve or reject this request.
+            </p>
+
+            <div class="footer">
+                <p>
+                    This is an automated message generated by the HR Management System.
+                </p>
+            </div>
+        </div>
+
+    </body>
+</html>
