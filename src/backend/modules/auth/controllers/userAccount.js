@@ -6,14 +6,20 @@ class UserAccount extends CrudController {
     constructor() {
         super(User);
     }
-    async list(query = {}, populateFields= null, sort= {}, project = null) {
-        populateFields="reportingTo branch shift"
-        return super.list(query, populateFields, sort, project ) 
+    async list(query = {}, populateFields = null, sort = {}, project = null) {
+        populateFields = "reportingTo branch shift"
+        return super.list(query, populateFields, sort, project)
     }
     // User Self-Service
     async getMe(user) {
         if (!user) throw new HttpError(401, "Unauthorized");
-        return await this.model.findById(user._id).populate("shift"); //sending updated value        
+        let userInfo = await this.model.findById(user._id).populate("shift").lean(); //sending updated value        
+        let reportedBy = (await this.model.find({
+            reportingTo: user._id,
+            ...this.commonFilters
+        },{_id:1}).lean()).map(u=>u._id)
+
+        return {...userInfo,reportedBy}
     }
 
     async updateProfile(userId, updateData) {
@@ -66,11 +72,11 @@ class UserAccount extends CrudController {
 
     async updateUserDetails(userId, data) {
         const result = await this.update(userId, data);
-        eventStream.emit("user.update", { 
-            userId, 
-            employeeID: result.employeeID, 
-            origin: result.origin, 
-            data: result 
+        eventStream.emit("user.update", {
+            userId,
+            employeeID: result.employeeID,
+            origin: result.origin,
+            data: result
         });
         return result;
     }
@@ -78,11 +84,11 @@ class UserAccount extends CrudController {
     async changeRole(userId, role) {
         if (!userId || !role) throw new HttpError(400, "User ID and role are required");
         const result = await this.update(userId, { role });
-        eventStream.emit("user.role_change", { 
-            userId, 
-            employeeID: result.employeeID, 
-            origin: result.origin, 
-            role 
+        eventStream.emit("user.role_change", {
+            userId,
+            employeeID: result.employeeID,
+            origin: result.origin,
+            role
         });
         return result;
     }
@@ -90,11 +96,11 @@ class UserAccount extends CrudController {
     async setStatus(userId, status) {
         if (!userId || !status) throw new HttpError(400, "User ID and status are required");
         const result = await this.update(userId, { workStatus: status });
-        eventStream.emit("user.status_change", { 
-            userId, 
-            employeeID: result.employeeID, 
-            origin: result.origin, 
-            status 
+        eventStream.emit("user.status_change", {
+            userId,
+            employeeID: result.employeeID,
+            origin: result.origin,
+            status
         });
         return result;
     }
@@ -109,11 +115,11 @@ class UserAccount extends CrudController {
 
     async create(data) {
         const result = await super.create(data);
-        eventStream.emit("user.create", { 
-            userId: result._id, 
-            employeeID: result.employeeID, 
-            origin: result.origin, 
-            data: result 
+        eventStream.emit("user.create", {
+            userId: result._id,
+            employeeID: result.employeeID,
+            origin: result.origin,
+            data: result
         });
         return result;
     }

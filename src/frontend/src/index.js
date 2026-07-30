@@ -14,9 +14,18 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
     <>
-        <Shared.Context.User.UserProvider>
+        <ContextProvider>
             <App />
-        </Shared.Context.User.UserProvider>
+        </ContextProvider>
         <Shared.Components.Toast />
     </>
 );
+function ContextProvider({ children }) {
+    return <>
+        <Shared.Context.Query.QueryProvider>
+            <Shared.Context.User.UserProvider>
+                { children }
+            </Shared.Context.User.UserProvider>
+        </Shared.Context.Query.QueryProvider>
+    </>
+}

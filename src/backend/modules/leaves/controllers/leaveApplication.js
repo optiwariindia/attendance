@@ -4,6 +4,7 @@ import { LeaveApplication, LeaveCategory } from "../models/index.js";
 import eventStream from "../../../core/events.js";
 
 class LeaveApplicationController extends CrudController {
+    
     async create(input) {
         console.log(input)
         let category = await LeaveCategory.findOne({

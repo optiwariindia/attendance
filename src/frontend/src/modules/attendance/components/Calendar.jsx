@@ -248,7 +248,7 @@ export default function Calendar() {
             </Grid>
           </AccordionSummary>
           <AccordionDetails>
-            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 2 }}>
+            {/* <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 2 }}>
               {Object.entries(STATUS_LABELS).map(([key, label]) => (
                 <Chip
                   key={key}
@@ -262,14 +262,16 @@ export default function Calendar() {
                   }}
                 />
               ))}
-            </Stack>
+            </Stack> */}
 
             {report && (
               <Box
                 sx={{
-                  p: 2,
+                  px: 2,
+                  py:1,
                   borderRadius: 2,
-                  backgroundColor: "#f8fbff",
+                  backgroundColor: "#f5f5f5",
+                  border: "1px solid #dbe7f3",
                   mb: 1,
                 }}
               >

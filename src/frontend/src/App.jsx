@@ -61,7 +61,6 @@ export default function App() {
 
 function RouteList({ user }) {
   const loginStatus = user.isLoggedIn;
-  console.log({ loginStatus, user });
   return useRoutes([
     {
       path: "/",
@@ -94,6 +93,17 @@ function RouteList({ user }) {
       ],
     },
     {
+      path: "/manager",
+      element: (loginStatus && user?.reportedBy?.length > 0) ? <Shared.Layout.Member /> : <Navigate to="/" />,
+      children: [
+        {
+          path: "/manager/leaves",
+          element: <Modules.Leave.Page.Manage />,
+        },
+      ],
+    },
+
+    {
       path: "/admin",
       element: loginStatus ? <Shared.Layout.Member /> : <Navigate to="/" />,
       children: [
@@ -112,8 +122,8 @@ function RouteList({ user }) {
       ],
     },
     {
-      path:"*",
-      element:<Navigate to="/"/>
+      path: "*",
+      element: <Navigate to="/" />
     }
     /*
     {

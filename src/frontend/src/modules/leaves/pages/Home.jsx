@@ -444,7 +444,7 @@ function CreateLeaveRequest({ onBack, setActiveLeave }) {
                 ) }
               />
             </Grid>
-            <Grid size={ 7 } container >
+            <Grid size={ { xs: 12, md: 7 } } container >
               <Grid
                 size={ { xs: 12, md: 4 } }
                 container
